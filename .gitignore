@@ -1,0 +1,58 @@
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# Node (Angular)
+# =====================
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =====================
+# .NET
+# =====================
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+
+# =====================
+# EF Core / Database
+# =====================
+*.db
+*.db-shm
+*.db-wal
+Migrations/*Snapshot.cs
+
+# =====================
+# IDEs
+# =====================
+.vs/
+.vscode/
+
+# =====================
+# Secrets
+# =====================
+appsettings.Development.json
+appsettings.*.Secrets.json
+secrets.json
+
+# =====================
+# Logs
+# =====================
+*.log
+
+# =====================
+# Angular environment (optional)
+# =====================
+frontend/taskflow-ui/src/environments/environment.prod.ts
