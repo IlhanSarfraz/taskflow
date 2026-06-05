@@ -1,3 +1,4 @@
+using TaskFlow.Infrastructure;
 using TaskFlow.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 builder.Services.AddPresistence(builder.Configuration);
+
+builder.Services.AddInfrastructure(builder.Configuration);
 
 WebApplication app = builder.Build();
 
