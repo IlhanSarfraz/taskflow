@@ -3,11 +3,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Domain.Entities;
 
 namespace TaskFlow.Infrastructure.Auth
 {
-    public class JwtTokenService
+    public class JwtTokenService : IJwtTokenService
     {
         public readonly JwtSettings _settings;
 

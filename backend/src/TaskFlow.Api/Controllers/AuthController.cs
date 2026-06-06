@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Application.Features.Auth.Commands.Login;
 using TaskFlow.Application.Features.Auth.Commands.Register;
 
 namespace TaskFlow.Api.Controllers;
@@ -18,6 +19,12 @@ public sealed class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(
         RegisterCommand command)
+    {
+        return Ok(await _mediator.Send(command));
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginCommand command)
     {
         return Ok(await _mediator.Send(command));
     }

@@ -1,4 +1,4 @@
-﻿namespace TaskFlow.Application.Features.Auth.DTOs
+﻿namespace TaskFlow.Application.Features.Auth.DTOs.Register
 {
     public sealed record RegisterResponse(
         Guid UserId,

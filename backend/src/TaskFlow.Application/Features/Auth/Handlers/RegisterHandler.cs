@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Application.Features.Auth.Commands.Register;
-using TaskFlow.Application.Features.Auth.DTOs;
+using TaskFlow.Application.Features.Auth.DTOs.Register;
 using TaskFlow.Domain.Entities;
 
 namespace TaskFlow.Application.Features.Auth.Handlers

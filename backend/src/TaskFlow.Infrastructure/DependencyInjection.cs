@@ -12,9 +12,9 @@ namespace TaskFlow.Infrastructure
             IConfiguration configuration)
         {
             services.Configure<JwtSettings>(
-                configuration.GetSection("JwtSettings"));
+                configuration.GetSection("Jwt"));
 
-            services.AddScoped<JwtTokenService>();
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             return services;

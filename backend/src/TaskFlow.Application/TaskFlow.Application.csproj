@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Auth\Commands\Login\" />
     <Folder Include="Features\Auth\Validators\" />
   </ItemGroup>
 
