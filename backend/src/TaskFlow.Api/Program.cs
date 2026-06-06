@@ -1,22 +1,31 @@
+using TaskFlow.Application;
 using TaskFlow.Infrastructure;
 using TaskFlow.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-
+// Services
 builder.Services.AddControllers();
 
+builder.Services.AddApplication();
 builder.Services.AddPresistence(builder.Configuration);
-
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 WebApplication app = builder.Build();
 
+// Swagger pipeline (ONLY in development)
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers();
+
 app.Run();

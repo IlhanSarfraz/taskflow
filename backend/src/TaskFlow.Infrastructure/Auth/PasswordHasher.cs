@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
+using TaskFlow.Application.Common.Interfaces;
 
 namespace TaskFlow.Infrastructure.Auth
 {
-    public class PasswordHasher
+    public class PasswordHasher : IPasswordHasher
     {
         public string Hash(string password)
         {

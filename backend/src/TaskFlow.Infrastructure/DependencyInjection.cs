@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Infrastructure.Auth;
 
 namespace TaskFlow.Infrastructure
@@ -14,7 +15,7 @@ namespace TaskFlow.Infrastructure
                 configuration.GetSection("JwtSettings"));
 
             services.AddScoped<JwtTokenService>();
-            services.AddScoped<PasswordHasher>();
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             return services;
         }

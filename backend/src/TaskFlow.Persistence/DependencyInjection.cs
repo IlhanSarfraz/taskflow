@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Persistence.Context;
 
 namespace TaskFlow.Persistence
@@ -17,6 +18,9 @@ namespace TaskFlow.Persistence
             {
                 options.UseSqlite(connectionString);
             });
+
+            services.AddScoped<IApplicationDbContext>(
+                provider => provider.GetRequiredService<AppDbContext>());
 
             return services;
         }
