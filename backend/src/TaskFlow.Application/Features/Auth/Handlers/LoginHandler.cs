@@ -13,14 +13,21 @@ namespace TaskFlow.Application.Features.Auth.Handlers
         private readonly IApplicationDbContext _context;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly ICookieService _cookieService;
+
         public LoginHandler(
             IApplicationDbContext context,
             IPasswordHasher passwordHasher,
-            IJwtTokenService jwtTokenService)
+            IJwtTokenService jwtTokenService,
+            IRefreshTokenService refreshTokenService,
+            ICookieService cookieService)
         {
             _context = context;
             _passwordHasher = passwordHasher;
             _jwtTokenService = jwtTokenService;
+            _refreshTokenService = refreshTokenService;
+            _cookieService = cookieService;
         }
 
         public async Task<LoginResponse> Handle(
@@ -40,6 +47,22 @@ namespace TaskFlow.Application.Features.Auth.Handlers
                 throw new InvalidOperationException(
                     "Invalid email or password.");
             }
+
+            string refreshToken = _refreshTokenService.Generate();
+
+            RefreshToken refreshTokenEntity = new()
+            {
+                Token = refreshToken,
+                UserId = user.Id,
+                ExpiresAtUtc = DateTime.UtcNow.AddDays(7),
+                CreatedAtUtc = DateTime.UtcNow
+            };
+
+            _context.RefreshTokens.Add(refreshTokenEntity);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            _cookieService.SetRefreshToken(refreshToken);
 
             string token = _jwtTokenService.GeneratedToken(user);
 

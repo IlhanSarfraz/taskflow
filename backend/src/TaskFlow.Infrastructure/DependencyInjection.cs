@@ -14,6 +14,10 @@ namespace TaskFlow.Infrastructure
             services.Configure<JwtSettings>(
                 configuration.GetSection("Jwt"));
 
+            services.AddHttpContextAccessor();
+
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<ICookieService, CookieService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
 
