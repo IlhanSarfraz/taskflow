@@ -11,6 +11,7 @@ builder.Services.AddApplication();
 builder.Services.AddPresistence(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 
+
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,6 +26,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// JWT authentication middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

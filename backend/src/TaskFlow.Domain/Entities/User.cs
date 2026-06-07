@@ -13,5 +13,7 @@ namespace TaskFlow.Domain.Entities
         public bool IsActive { get; set; } = true;
         public ICollection<RefreshToken> RefreshTokens { get; set; }
             = new List<RefreshToken>();
+        public ICollection<Project> Projects { get; set; }
+            = new List<Project>();
     }
 }
