@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Auth.Commands.CreateProject;
+using TaskFlow.Application.Features.Projects.Commands;
 using TaskFlow.Application.Features.Projects.Queries.GetProjectById;
 using TaskFlow.Application.Features.Projects.Queries.GetProjects;
 
@@ -37,6 +38,17 @@ namespace TaskFlow.Api.Controllers
         public async Task<IActionResult> GetProjectById(Guid id)
         {
             return Ok(await _mediator.Send(new GetProjectByIdQuery(id)));
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(
+            Guid id,
+            UpdateProjectCommand command)
+        {
+            if (id != command.Id)
+                return BadRequest("Route id does not match request id.");
+
+            return Ok(await _mediator.Send(command));
         }
     }
 }
