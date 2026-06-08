@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Auth.Commands.CreateProject;
-using TaskFlow.Application.Features.Projects.Commands;
+using TaskFlow.Application.Features.Projects.Commands.DeleteProject;
+using TaskFlow.Application.Features.Projects.Commands.UpdateProject;
 using TaskFlow.Application.Features.Projects.Queries.GetProjectById;
 using TaskFlow.Application.Features.Projects.Queries.GetProjects;
 
@@ -49,6 +50,14 @@ namespace TaskFlow.Api.Controllers
                 return BadRequest("Route id does not match request id.");
 
             return Ok(await _mediator.Send(command));
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _mediator.Send(new DeleteProjectCommand(id));
+
+            return NoContent();
         }
     }
 }

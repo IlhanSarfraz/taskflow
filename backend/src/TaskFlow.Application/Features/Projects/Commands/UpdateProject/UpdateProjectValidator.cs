@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace TaskFlow.Application.Features.Projects.Commands
+namespace TaskFlow.Application.Features.Projects.Commands.UpdateProject
 {
     public sealed class UpdateProjectValidator
         : AbstractValidator<UpdateProjectCommand>

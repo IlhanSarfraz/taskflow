@@ -4,7 +4,7 @@ using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Application.Features.Auth.DTOs.Project;
 using TaskFlow.Domain.Entities;
 
-namespace TaskFlow.Application.Features.Projects.Commands
+namespace TaskFlow.Application.Features.Projects.Commands.UpdateProject
 {
     public sealed class UpdateProjectHandler
         : IRequestHandler<UpdateProjectCommand, ProjectResponse>
