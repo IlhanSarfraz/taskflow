@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Auth.Commands.CreateProject;
+using TaskFlow.Application.Features.Projects.Queries.GetProjectById;
 using TaskFlow.Application.Features.Projects.Queries.GetProjects;
 
 namespace TaskFlow.Api.Controllers
@@ -30,6 +31,12 @@ namespace TaskFlow.Api.Controllers
         public async Task<IActionResult> GetProjects()
         {
             return Ok(await _mediator.Send(new GetProjectsQuery()));
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetProjectById(Guid id)
+        {
+            return Ok(await _mediator.Send(new GetProjectByIdQuery(id)));
         }
     }
 }
