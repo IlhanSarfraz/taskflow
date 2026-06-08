@@ -9,5 +9,7 @@ namespace TaskFlow.Domain.Entities
         public string Description { get; set; } = string.Empty;
         public Guid OwnerId { get; set; }
         public User Owner { get; set; } = null!;
+        public ICollection<Board> Boards { get; set; }
+            = new List<Board>();
     }
 }

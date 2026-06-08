@@ -8,6 +8,8 @@ namespace TaskFlow.Application.Common.Interfaces
         DbSet<User> Users { get; }
         DbSet<RefreshToken> RefreshTokens { get; }
         DbSet<Project> Projects { get; }
+        DbSet<Board> Boards { get; }
+
         Task<int> SaveChangesAsync(
             CancellationToken cancellationToken = default);
     }
