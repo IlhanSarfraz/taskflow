@@ -16,6 +16,7 @@ namespace TaskFlow.Persistence.Context
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         public DbSet<Project> Projects => Set<Project>();
         public DbSet<Board> Boards => Set<Board>();
+        public DbSet<BoardColumn> BoardColumns => Set<BoardColumn>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

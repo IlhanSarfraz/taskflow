@@ -9,6 +9,7 @@ namespace TaskFlow.Application.Common.Interfaces
         DbSet<RefreshToken> RefreshTokens { get; }
         DbSet<Project> Projects { get; }
         DbSet<Board> Boards { get; }
+        DbSet<BoardColumn> BoardColumns { get; }
 
         Task<int> SaveChangesAsync(
             CancellationToken cancellationToken = default);

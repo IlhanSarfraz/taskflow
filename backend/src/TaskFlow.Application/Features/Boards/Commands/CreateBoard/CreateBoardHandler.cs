@@ -38,6 +38,15 @@ namespace TaskFlow.Application.Features.Boards.Commands.CreateBoard
 
             _context.Boards.Add(board);
 
+            List<BoardColumn> columns = new()
+            {
+                new BoardColumn { Name = "To Do", Order = 0, Board = board },
+                new BoardColumn { Name = "In Progress", Order = 1, Board = board },
+                new BoardColumn { Name = "Done", Order = 2, Board = board }
+            };
+
+            _context.BoardColumns.AddRange(columns);
+
             await _context.SaveChangesAsync(cancellationToken);
 
             return new BoardResponse(
