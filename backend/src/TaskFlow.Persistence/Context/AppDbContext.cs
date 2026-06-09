@@ -17,6 +17,7 @@ namespace TaskFlow.Persistence.Context
         public DbSet<Project> Projects => Set<Project>();
         public DbSet<Board> Boards => Set<Board>();
         public DbSet<BoardColumn> BoardColumns => Set<BoardColumn>();
+        public DbSet<TaskItem> Tasks => Set<TaskItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
