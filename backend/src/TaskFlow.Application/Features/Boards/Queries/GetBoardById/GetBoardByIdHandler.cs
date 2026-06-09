@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Application.Features.Boards.DTOs;
-using TaskFlow.Domain.Entities;
+using TaskFlow.Application.Features.Tasks.Dtos;
 
 namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
 {
@@ -22,27 +22,35 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
             GetBoardByIdQuery request,
             CancellationToken cancellationToken)
         {
-            Board board = await _context.Boards
+            BoardDetailsResponse? board = await _context.Boards
                 .AsNoTracking()
-                .Include(x => x.Project)
-                .Include(x => x.Columns)
-                .FirstOrDefaultAsync(
-                    x => x.Id == request.BoardId &&
-                         x.Project.OwnerId == _currentUser.UserId,
-                    cancellationToken)
-                ?? throw new KeyNotFoundException("Board not found.");
+                .Where(x =>
+                    x.Id == request.BoardId &&
+                    x.Project.OwnerId == _currentUser.UserId)
+                .Select(b => new BoardDetailsResponse(
+                    b.Id,
+                    b.Name,
+                    b.ProjectId,
+                    b.Columns
+                        .OrderBy(c => c.Order)
+                        .Select(c => new BoardColumnResponse(
+                            c.Id,
+                            c.Name,
+                            c.Order,
+                            c.Tasks.Select(t => new TaskSummaryResponse(
+                                t.Id,
+                                t.Title,
+                                t.Priority
+                            )).ToList()
+                        ))
+                        .ToList()
+                ))
+                .FirstOrDefaultAsync(cancellationToken);
 
-            return new BoardDetailsResponse(
-                board.Id,
-                board.Name,
-                board.ProjectId,
-                board.Columns
-                    .OrderBy(x => x.Order)
-                    .Select(x => new BoardColumnResponse(
-                        x.Id,
-                        x.Name,
-                        x.Order))
-                    .ToList());
+            if (board is null)
+                throw new KeyNotFoundException("Board not found.");
+
+            return board;
         }
     }
 }
