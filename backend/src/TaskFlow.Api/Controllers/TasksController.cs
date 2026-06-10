@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
+using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
@@ -58,6 +59,15 @@ namespace TaskFlow.Api.Controllers
                     request.Description,
                     request.Priority,
                     request.DueDate));
+
+            return NoContent();
+        }
+
+        [HttpDelete("{taskId:guid}")]
+        public async Task<IActionResult> Delete(Guid taskId)
+        {
+            await _mediator.Send(
+                new DeleteTaskCommand(taskId));
 
             return NoContent();
         }
