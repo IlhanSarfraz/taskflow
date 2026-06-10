@@ -7,7 +7,9 @@ using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
 using TaskFlow.Application.Features.Tasks.Queries.GetMyTasks;
+using TaskFlow.Application.Features.Tasks.Queries.GetProjectTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
+using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -89,6 +91,23 @@ namespace TaskFlow.Api.Controllers
         public async Task<IActionResult> GetMyTasks()
         {
             return Ok(await _mediator.Send(new GetMyTasksQuery()));
+        }
+
+        [HttpGet("/api/projects/{projectId:guid}/tasks")]
+        public async Task<IActionResult> GetProjectTasks(
+            Guid projectId,
+            Guid? columnId,
+            TaskPriority? priority,
+            int page = 1,
+            int pageSize = 20)
+        {
+            return Ok(await _mediator.Send(
+                new GetProjectTasksQuery(
+                    projectId,
+                    columnId,
+                    priority,
+                    page,
+                    pageSize)));
         }
     }
 }
