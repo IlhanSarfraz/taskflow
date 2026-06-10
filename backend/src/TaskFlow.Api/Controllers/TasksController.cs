@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Application.Features.Tasks.Commands.AssignTask;
 using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
@@ -68,6 +69,17 @@ namespace TaskFlow.Api.Controllers
         {
             await _mediator.Send(
                 new DeleteTaskCommand(taskId));
+
+            return NoContent();
+        }
+
+        [HttpPut("{taskId:guid}/assign")]
+        public async Task<IActionResult> Assign(
+            Guid taskId,
+            Guid assigneeId)
+        {
+            await _mediator.Send(
+                new AssignTaskCommand(taskId, assigneeId));
 
             return NoContent();
         }

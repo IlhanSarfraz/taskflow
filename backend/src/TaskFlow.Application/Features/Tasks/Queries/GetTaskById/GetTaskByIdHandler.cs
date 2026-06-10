@@ -35,7 +35,8 @@ namespace TaskFlow.Application.Features.Tasks.Queries.GetTaskById
                     x.Priority,
                     x.DueDate,
                     x.ProjectId,
-                    x.BoardColumnId))
+                    x.BoardColumnId,
+                    x.AssigneeId))
                 .FirstOrDefaultAsync(cancellationToken)
                 ?? throw new KeyNotFoundException("Task not found.");
 

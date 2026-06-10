@@ -9,5 +9,6 @@ namespace TaskFlow.Application.Features.Tasks.Dtos
         TaskPriority Priority,
         DateTime? DueDate,
         Guid ProjectId,
-        Guid BoardColumnId);
+        Guid BoardColumnId,
+        Guid? AssigneeId);
 }

@@ -20,5 +20,6 @@ namespace TaskFlow.Domain.Entities
         public Guid BoardColumnId { get; set; }
 
         public BoardColumn BoardColumn { get; set; } = null!;
+        public Guid? AssigneeId { get; set; }
     }
 }
