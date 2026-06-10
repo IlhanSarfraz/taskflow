@@ -6,6 +6,7 @@ using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
+using TaskFlow.Application.Features.Tasks.Queries.GetMyTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
 
 namespace TaskFlow.Api.Controllers
@@ -82,6 +83,12 @@ namespace TaskFlow.Api.Controllers
                 new AssignTaskCommand(taskId, assigneeId));
 
             return NoContent();
+        }
+
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyTasks()
+        {
+            return Ok(await _mediator.Send(new GetMyTasksQuery()));
         }
     }
 }
