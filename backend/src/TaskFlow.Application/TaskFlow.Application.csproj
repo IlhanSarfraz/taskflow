@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Features\Tasks\Commands\NewFolder\**" />
+    <EmbeddedResource Remove="Features\Tasks\Commands\NewFolder\**" />
+    <None Remove="Features\Tasks\Commands\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TaskFlow.Domain\TaskFlow.Domain.csproj" />
   </ItemGroup>
 

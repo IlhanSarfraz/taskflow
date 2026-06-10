@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
+using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -22,6 +23,19 @@ namespace TaskFlow.Api.Controllers
             CreateTaskCommand command)
         {
             return Ok(await _mediator.Send(command));
+        }
+
+        [HttpPut("{taskId:guid}/move")]
+        public async Task<IActionResult> Move(
+            Guid taskId,
+            MoveTaskRequest request)
+        {
+            await _mediator.Send(
+                new MoveTaskCommand(
+                    taskId,
+                    request.TargetColumnId));
+
+            return NoContent();
         }
     }
 }
