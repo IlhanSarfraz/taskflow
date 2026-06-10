@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
+using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -36,6 +37,12 @@ namespace TaskFlow.Api.Controllers
                     request.TargetColumnId));
 
             return NoContent();
+        }
+
+        [HttpGet("{taskId:guid}")]
+        public async Task<IActionResult> GetById(Guid taskId)
+        {
+            return Ok(await _mediator.Send(new GetTaskByIdQuery(taskId)));
         }
     }
 }
