@@ -22,6 +22,7 @@
       </div>
 
       <div *ngFor="let task of column.tasks"
+            (click)="openTask(task.id)"
            style="background: white; margin: 5px 0; padding: 8px; border-radius: 5px;">
 
         <strong>{{ task.title }}</strong>

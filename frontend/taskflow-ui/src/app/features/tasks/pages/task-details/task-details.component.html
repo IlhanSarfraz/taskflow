@@ -1,0 +1,38 @@
+<div *ngIf="loading">
+  Loading task...
+</div>
+
+<div *ngIf="!loading && task">
+
+  <h2>{{ task.title }}</h2>
+
+  <p>
+    <strong>Description:</strong>
+  </p>
+
+  <p>
+    {{ task.description || 'No description provided.' }}
+  </p>
+
+  <hr>
+
+  <p>
+    <strong>Priority:</strong>
+    {{ task.priority }}
+  </p>
+
+  <p>
+    <strong>Due Date:</strong>
+    {{ task.dueDate || 'Not set' }}
+  </p>
+
+  <p>
+    <strong>Assignee:</strong>
+    {{ task.assigneeId || 'Unassigned' }}
+  </p>
+
+  <button (click)="goBack()">
+    Back
+  </button>
+
+</div>

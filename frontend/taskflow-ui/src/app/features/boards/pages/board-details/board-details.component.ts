@@ -54,4 +54,11 @@ export class BoardDetailsComponent {
       'create'
     ]);
   }
+
+  openTask(taskId: string): void{
+    this.router.navigate([
+      `/tasks`,
+      taskId
+    ]);
+  }
 }
