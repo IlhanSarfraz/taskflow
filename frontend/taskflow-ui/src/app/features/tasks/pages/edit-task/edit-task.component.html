@@ -1,0 +1,44 @@
+<div *ngIf="loading">
+  Loading...
+</div>
+
+<form
+  *ngIf="!loading"
+  [formGroup]="form"
+  (ngSubmit)="save()">
+
+  <h2>Edit Task</h2>
+
+  <input
+    type="text"
+    placeholder="Title"
+    formControlName="title">
+
+  <br><br>
+
+  <textarea
+    placeholder="Description"
+    formControlName="description">
+  </textarea>
+
+  <br><br>
+
+  <select formControlName="priority">
+    <option [value]="1">Low</option>
+    <option [value]="2">Medium</option>
+    <option [value]="3">High</option>
+  </select>
+
+  <br><br>
+
+  <input
+    type="date"
+    formControlName="dueDate">
+
+  <br><br>
+
+  <button type="submit">
+    Save Changes
+  </button>
+
+</form>

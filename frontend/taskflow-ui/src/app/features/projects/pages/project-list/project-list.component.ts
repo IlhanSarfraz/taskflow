@@ -58,4 +58,12 @@ export class ProjectListComponent {
       }
     });
   }
+
+  viewBoards(projectId: string): void {
+    this.router.navigate([
+      '/projects',
+      projectId,
+      'boards'
+    ]);
+  }
 }

@@ -24,7 +24,8 @@ export class AuthService{
 
     login(
         request: LoginRequest
-    ): Observable<LoginResponse>{
+    ):
+     Observable<LoginResponse>{
         return this.api.post<LoginResponse>(
             'Auth/login',
             request
