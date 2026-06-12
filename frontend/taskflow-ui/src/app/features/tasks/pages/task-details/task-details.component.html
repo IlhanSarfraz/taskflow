@@ -31,6 +31,14 @@
     {{ task.assigneeId || 'Unassigned' }}
   </p>
 
+  <button (click)="editTask()">
+    Edit
+  </button>
+
+  <button (click)="DeleteTask()">
+    Delete
+  </button>
+
   <button (click)="goBack()">
     Back
   </button>

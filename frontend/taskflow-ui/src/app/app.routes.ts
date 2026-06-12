@@ -72,6 +72,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/tasks/pages/task-details/task-details.component')
         .then(m => m.TaskDetailsComponent)
+  },
+  {
+    path: `tasks/:taskId/edit`,
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import(`./features/tasks/pages/edit-task/edit-task.component`)
+          .then(m => m.EditTaskComponent)
   }
-
 ];

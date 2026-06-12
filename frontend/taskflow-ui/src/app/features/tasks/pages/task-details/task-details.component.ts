@@ -12,6 +12,7 @@ import { TaskDetails } from '../../models/task-details';
   styleUrl: './task-details.component.scss',
 })
 export class TaskDetailsComponent {
+
   private taskService = inject(TaskService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -39,5 +40,36 @@ export class TaskDetailsComponent {
 
   goBack(): void{
     history.back();
+  }
+
+  editTask(): void {
+    if(!this.task) return;
+
+    this.router.navigate([
+      `/tasks`,
+      this.task.id,
+      `edit`
+    ]);
+  }
+
+  DeleteTask(): void {
+
+    if (!this.task) return;
+
+    const confirmDelete = confirm(
+      'Are you sure you want to delete this task?'
+    );
+
+    if (!confirmDelete) return;
+
+    this.taskService.DeleteTask(this.task.id)
+      .subscribe({
+        next: () => {
+          history.back(); 
+        },
+        error: (err) => {
+          console.error('DELETE TASK ERROR:', err);
+        }
+      });
   }
 }
