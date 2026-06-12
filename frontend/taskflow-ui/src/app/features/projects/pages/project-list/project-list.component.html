@@ -1,0 +1,17 @@
+<h2>Projects</h2>
+
+<div *ngIf="loading">
+    Loading projects.....
+</div>
+
+<div *ngIf="!loading && projects.length === 0">
+    No projects found
+</div>
+
+<ul *ngIf="!loading && projects.length > 0">
+  <li *ngFor="let project of projects">
+    <strong>{{ project.name }}</strong>
+    <span>({{ project.key }})</span>
+    <p>{{ project.description }}</p>
+  </li>
+</ul>
