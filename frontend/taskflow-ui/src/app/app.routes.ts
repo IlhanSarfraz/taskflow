@@ -4,7 +4,7 @@ import { authGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'projects',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
 
@@ -44,5 +44,19 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/pages/register/register.component')
         .then(m => m.RegisterComponent)
+  },
+  {
+    path: 'projects/:projectId/boards',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/boards/pages/board-list/board-list.component')
+        .then(m => m.BoardListComponent)
+  },
+  {
+    path: 'boards/:boardId',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/boards/pages/board-details/board-details.component')
+        .then(m => m.BoardDetailsComponent)
   }
 ];

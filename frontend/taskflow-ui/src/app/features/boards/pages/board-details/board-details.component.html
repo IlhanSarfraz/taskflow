@@ -1,0 +1,35 @@
+<h2 *ngIf="board">{{ board.name }}</h2>
+
+<div *ngIf="loading">
+  Loading board.............
+</div>
+
+<div *ngIf="!loading && board">
+
+  <div style="display: flex; gap: 20px;">
+
+    <div *ngFor="let column of board.column"
+         style="min-width: 250px; background: #f4f4f4; padding: 10px; border-radius: 8px;">
+
+      <h3>{{ column.name }}</h3>
+
+      <div *ngIf="column.tasks.length === 0">
+        No tasks
+      </div>
+
+      <div *ngFor="let task of column.tasks"
+           style="background: white; margin: 5px 0; padding: 8px; border-radius: 5px;">
+
+        <strong>{{ task.title }}</strong>
+
+        <div>
+          Priority: {{ task.priority }}
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
