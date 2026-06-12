@@ -58,5 +58,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/boards/pages/board-details/board-details.component')
         .then(m => m.BoardDetailsComponent)
+  },
+  {
+    path: 'boards/:boardId/projects/:projectId/columns/:columnId/tasks/create',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/tasks/pages/create-task/create-task.component')
+        .then(m => m.CreateTaskComponent)
   }
 ];

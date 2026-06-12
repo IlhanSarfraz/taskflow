@@ -11,7 +11,11 @@
     <div *ngFor="let column of board.column"
          style="min-width: 250px; background: #f4f4f4; padding: 10px; border-radius: 8px;">
 
-      <h3>{{ column.name }}</h3>
+        <h3>{{ column.name }}</h3>
+
+        <button (click)="openCreateTask(column.id)">
+        + Task
+        </button>
 
       <div *ngIf="column.tasks.length === 0">
         No tasks

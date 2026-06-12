@@ -1,0 +1,26 @@
+<h2>Create Task</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <input placeholder="Title" formControlName="title" />
+  <br>
+
+  <textarea placeholder="Description" formControlName="description"></textarea>
+  <br>
+
+  <select formControlName="priority">
+    <option [value]="1">Low</option>
+    <option [value]="2">Medium</option>
+    <option [value]="3">High</option>
+  </select>
+
+  <br>
+
+  <input type="date" formControlName="dueDate" />
+  <br>
+
+  <button type="submit" [disabled]="loading">
+    Create Task
+  </button>
+
+</form>
