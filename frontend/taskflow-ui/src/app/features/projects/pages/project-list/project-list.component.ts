@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ProjectService } from '../../services/project.service';
 import { Project } from '../../models/project.model';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-project-list',
@@ -12,6 +13,8 @@ import { CommonModule } from '@angular/common';
 })
 export class ProjectListComponent {
   private readonly projectService = inject(ProjectService)
+  private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   projects: Project[] = [];
   loading = true;
@@ -27,11 +30,15 @@ export class ProjectListComponent {
       next: (data) => {
         this.projects = data;
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(`Failed to load projects`, err);
         this.loading = false;
       }
     })
+  }
+  goToEdit(id: string): void {
+    this.router.navigate(['/projects/edit', id]);
   }
 }

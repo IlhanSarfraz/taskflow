@@ -29,5 +29,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/projects/pages/create-project/create-project.component')
         .then(m => m.CreateProjectComponent)
+  },
+  {
+    path: 'projects/edit/:id',
+    loadComponent: () =>
+      import('./features/projects/pages/edit-project/edit-project.component')
+        .then(m => m.EditProjectComponent)
   }
 ];

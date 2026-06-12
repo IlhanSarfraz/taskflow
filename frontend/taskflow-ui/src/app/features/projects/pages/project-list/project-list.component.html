@@ -13,5 +13,9 @@
     <strong>{{ project.name }}</strong>
     <span>({{ project.key }})</span>
     <p>{{ project.description }}</p>
+
+    <button (click)="goToEdit(project.id)">
+        Edit
+    </button>
   </li>
 </ul>

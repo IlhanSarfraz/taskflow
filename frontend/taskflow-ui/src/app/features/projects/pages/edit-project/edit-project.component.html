@@ -1,0 +1,15 @@
+<h2>Edit Project</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <input placeholder="Project Name" formControlName="name" />
+  <br>
+
+  <textarea placeholder="Description" formControlName="description"></textarea>
+  <br>
+
+  <button type="submit" [disabled]="loading">
+    Update
+  </button>
+
+</form>

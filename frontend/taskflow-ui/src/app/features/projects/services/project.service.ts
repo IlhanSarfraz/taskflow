@@ -36,7 +36,7 @@ export class ProjectService{
         request: UpdateProjectRequest
     ): Observable<Project>{
         return this.api.put<Project>(
-            `Project/${request.id}`,
+            `Projects/${request.id}`,
             request
         );
     }
