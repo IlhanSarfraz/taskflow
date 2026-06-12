@@ -1,0 +1,61 @@
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ProjectService } from '../../services/project.service';
+import { Project } from '../../models/project.model';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-project-list',
+  imports: [CommonModule],
+  standalone: true,
+  templateUrl: './project-list.component.html',
+  styleUrl: './project-list.component.scss',
+})
+export class ProjectListComponent {
+  private readonly projectService = inject(ProjectService)
+  private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
+
+  projects: Project[] = [];
+  loading = true;
+
+  ngOnInit(): void {
+    this.loadProjects();
+  }
+
+  loadProjects(): void {
+    this.loading = true;
+
+    this.projectService.GetProjects().subscribe({
+      next: (data) => {
+        this.projects = data;
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error(`Failed to load projects`, err);
+        this.loading = false;
+      }
+    })
+  }
+  
+  goToEdit(id: string): void {
+    this.router.navigate(['/projects/edit', id]);
+  }
+
+  deleteProject(id: string): void {
+    
+    const confirmDelete = confirm('Are you sure you want to delete this project?');
+    if (!confirmDelete) return;
+    
+    this.projectService.deleteProject(id)
+    .subscribe({
+      next: () => {
+        this.projects = this.projects.filter(p => p.id !== id);
+      },
+      error: (err) => {
+        console.error(`Delete Failed`, err)
+      }
+    });
+  }
+}
