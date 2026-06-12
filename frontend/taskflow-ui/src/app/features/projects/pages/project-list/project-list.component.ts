@@ -38,7 +38,24 @@ export class ProjectListComponent {
       }
     })
   }
+  
   goToEdit(id: string): void {
     this.router.navigate(['/projects/edit', id]);
+  }
+
+  deleteProject(id: string): void {
+    
+    const confirmDelete = confirm('Are you sure you want to delete this project?');
+    if (!confirmDelete) return;
+    
+    this.projectService.deleteProject(id)
+    .subscribe({
+      next: () => {
+        this.projects = this.projects.filter(p => p.id !== id);
+      },
+      error: (err) => {
+        console.error(`Delete Failed`, err)
+      }
+    });
   }
 }
