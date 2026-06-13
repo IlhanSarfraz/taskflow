@@ -11,6 +11,7 @@ namespace TaskFlow.Application.Common.Interfaces
         DbSet<Board> Boards { get; }
         DbSet<BoardColumn> BoardColumns { get; }
         DbSet<TaskItem> Tasks { get; }
+        DbSet<ProjectMember> ProjectMembers { get; }
 
         Task<int> SaveChangesAsync(
             CancellationToken cancellationToken = default);
