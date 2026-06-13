@@ -31,4 +31,11 @@ export class BoardService {
       request
     );
   }
+
+  moveTask(taskId: string, targetColumnId: string) {
+    return this.api.put(
+      `Tasks/${taskId}/move`,
+      { targetColumnId }
+    );
+  }
 }
