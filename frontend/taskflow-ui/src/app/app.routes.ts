@@ -79,5 +79,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import(`./features/tasks/pages/edit-task/edit-task.component`)
           .then(m => m.EditTaskComponent)
+  },
+  {
+    path: 'projects/:projectId/members',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/projects/pages/project-members/project-members.component')
+        .then(m => m.ProjectMembersComponent)
   }
 ];

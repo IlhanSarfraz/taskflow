@@ -4,11 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { BoardService } from '../../services/board.service';
 import { BoardSummary } from '../../models/board-summary.model';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CreateBoardRequest } from '../../models/create-board-request.model';
 
 @Component({
   selector: 'app-board-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './board-list.component.html'
 })
 export class BoardListComponent {
@@ -17,11 +19,16 @@ export class BoardListComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private fb = inject(FormBuilder);
 
   boards: BoardSummary[] = [];
   loading = true;
 
   projectId!: string;
+
+  boardForm = this.fb.group({
+    name: ['', Validators.required]
+  });
 
   ngOnInit(): void {
     this.projectId = this.route.snapshot.paramMap.get('projectId')!;
@@ -50,5 +57,23 @@ export class BoardListComponent {
       '/boards',
       boardId
     ]);
+  }
+
+  createBoard(): void {
+    if (this.boardForm.invalid) return;
+
+    const request: CreateBoardRequest = {
+      projectId: this.projectId,
+      name: this.boardForm.value.name!
+    };
+
+    this.boardService.createBoard(request)
+      .subscribe({
+        next: () => {
+          this.boardForm.reset();
+          this.loadBoards(); // refresh list
+        },
+        error: (err) => console.error(err)
+      });
   }
 }

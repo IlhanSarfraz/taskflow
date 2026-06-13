@@ -26,12 +26,27 @@
     {{ task.dueDate || 'Not set' }}
   </p>
 
-  <p>
-    <strong>Assignee:</strong>
-    {{ task.assigneeId || 'Unassigned' }}
-  </p>
+  <hr>
 
-  <button (click)="editTask()">
+  <h3>Assign Task</h3>
+
+  <select [(ngModel)]="assigneeId">
+    <option value="">Select project member</option>
+
+    <option *ngFor="let m of members" [value]="m.userId">
+      {{ m.fullName }} ({{ m.role }})
+    </option>
+  </select>
+
+  <button (click)="AssignTask()" [disabled]="!assigneeId">
+    Assign
+  </button>
+
+  <button (click)="AssignTask()">
+    Assign
+  </button>
+
+  <button (click)="EditTask()">
     Edit
   </button>
 

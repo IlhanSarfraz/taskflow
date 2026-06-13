@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 
 import { BoardSummary } from "../models/board-summary.model";
 import { BoardDetails } from "../models/board-details.model";
+import { CreateBoardRequest } from "../models/create-board-request.model";
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,13 @@ export class BoardService {
   getBoardById(boardId: string): Observable<BoardDetails> {
     return this.api.get<BoardDetails>(
       `boards/${boardId}`
+    );
+  }
+
+  createBoard(request: CreateBoardRequest): Observable<any> {
+    return this.api.post(
+      'Boards',
+      request
     );
   }
 }
