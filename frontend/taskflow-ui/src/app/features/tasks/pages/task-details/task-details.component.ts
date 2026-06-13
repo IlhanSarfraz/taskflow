@@ -3,10 +3,13 @@ import { TaskService } from '../../services/task.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskDetails } from '../../models/task-details';
+import { FormsModule } from '@angular/forms';
+import { ProjectMemberService } from '../../../projects/services/project-member.service';
+import { ProjectMember } from '../../../projects/models/project-member.model';
 
 @Component({
   selector: 'app-task-details',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   standalone: true,
   templateUrl: './task-details.component.html',
   styleUrl: './task-details.component.scss',
@@ -17,18 +20,24 @@ export class TaskDetailsComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private memberService = inject(ProjectMemberService);
 
   task?: TaskDetails;
+  assigneeId: string = '';
   loading = true;
+  members: ProjectMember[] = [];
 
-  ngOnInit(): void{
-    const taskId = this.route.snapshot.paramMap.get(`taskId`)!;
+ngOnInit(): void {
+  const taskId = this.route.snapshot.paramMap.get(`taskId`)!;
 
-    this.taskService.GetTaskById(taskId)
+  this.taskService.GetTaskById(taskId)
     .subscribe({
       next: (task) => {
         this.task = task;
         this.loading = false;
+
+        this.loadMembers(task.projectId);
+
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -36,13 +45,13 @@ export class TaskDetailsComponent {
         this.loading = false;
       }
     });
-  }
+}
 
   goBack(): void{
     history.back();
   }
 
-  editTask(): void {
+  EditTask(): void {
     if(!this.task) return;
 
     this.router.navigate([
@@ -71,5 +80,43 @@ export class TaskDetailsComponent {
           console.error('DELETE TASK ERROR:', err);
         }
       });
+  }
+
+  AssignTask(): void {
+
+    if (!this.task || !this.assigneeId) return;
+
+    this.taskService.AssignTask(
+      this.task.id,
+      this.assigneeId
+    )
+    .subscribe({
+      next: () => {
+
+        alert('Task assigned successfully');
+
+        // refresh task details
+        this.ReloadTask();
+      },
+      error: (err) => {
+        console.error('ASSIGN ERROR:', err);
+      }
+    });
+  }
+
+  ReloadTask(): void {
+    this.taskService.GetTaskById(this.task?.id!)
+      .subscribe({
+        next: (task) => {
+          this.task = task;
+        }
+      });
+  }
+
+  loadMembers(projectId: string) {
+  this.memberService.getMembers(projectId)
+    .subscribe(res =>{
+      this.members = res;
+    }); 
   }
 }

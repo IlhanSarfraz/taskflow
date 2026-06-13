@@ -67,6 +67,13 @@ export const routes: Routes = [
         .then(m => m.CreateTaskComponent)
   },
   {
+    path: 'tasks/my',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/tasks/pages/my-tasks/my-tasks.component')
+        .then(m => m.MyTasksComponent)
+  },
+  {
     path: 'tasks/:taskId',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -79,5 +86,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import(`./features/tasks/pages/edit-task/edit-task.component`)
           .then(m => m.EditTaskComponent)
+  },
+  {
+    path: 'projects/:projectId/members',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/projects/pages/project-members/project-members.component')
+        .then(m => m.ProjectMembersComponent)
   }
 ];

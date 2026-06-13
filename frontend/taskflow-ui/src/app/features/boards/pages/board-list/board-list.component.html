@@ -20,6 +20,14 @@
     </li>
 </ul>
 
-<button>
+<h3>Create Board</h3>
+
+<input
+  type="text"
+  placeholder="Board name"
+  [formControl]="boardForm.controls.name"
+/>
+
+<button (click)="createBoard()">
   Create Board
 </button>
