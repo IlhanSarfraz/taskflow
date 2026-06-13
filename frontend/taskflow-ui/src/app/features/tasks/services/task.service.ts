@@ -42,12 +42,16 @@ export class TaskService{
         )
     }
 
-    AssignTask(
-        taskId: string,
-        assigneeId: string){
-            return this.api.put(
-                `Tasks/${taskId}/assign`,
-                assigneeId
-            );
-        }
+    AssignTask(taskId: string, assigneeId: string) {
+    return this.api.put(
+        `Tasks/${taskId}/assign`,
+        { assigneeId }
+    );
+    }
+
+    GetMyTasks(){
+        return this.api.get<TaskDetails[]>(
+            `Tasks/my`
+        );
+    }
 }

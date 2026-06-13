@@ -114,8 +114,9 @@ ngOnInit(): void {
   }
 
   loadMembers(projectId: string) {
-    debugger;
   this.memberService.getMembers(projectId)
-    .subscribe(res => this.members = res);
-}
+    .subscribe(res =>{
+      this.members = res;
+    }); 
+  }
 }

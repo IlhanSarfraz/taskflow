@@ -6,6 +6,7 @@ using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
+using TaskFlow.Application.Features.Tasks.Dtos;
 using TaskFlow.Application.Features.Tasks.Queries.GetMyTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetProjectTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
@@ -79,10 +80,10 @@ namespace TaskFlow.Api.Controllers
         [HttpPut("{taskId:guid}/assign")]
         public async Task<IActionResult> Assign(
             Guid taskId,
-            Guid assigneeId)
+            AssignTaskRequest request)
         {
             await _mediator.Send(
-                new AssignTaskCommand(taskId, assigneeId));
+                new AssignTaskCommand(taskId, request.AssigneeId));
 
             return NoContent();
         }
