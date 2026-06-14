@@ -1,0 +1,33 @@
+<h2>Boards</h2>
+
+<div *ngIf="loading">
+  Loading boards...
+</div>
+
+<div *ngIf="!loading && boards.length === 0">
+  No boards found for this project.
+</div>
+
+<ul *ngIf="!loading && boards.length > 0">
+  <li *ngFor="let board of boards">
+
+    {{ board.name }}
+
+    <button (click)="openBoard(board.id)">
+        Open Board
+    </button>
+
+    </li>
+</ul>
+
+<h3>Create Board</h3>
+
+<input
+  type="text"
+  placeholder="Board name"
+  [formControl]="boardForm.controls.name"
+/>
+
+<button (click)="createBoard()">
+  Create Board
+</button>

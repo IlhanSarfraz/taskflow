@@ -1,0 +1,57 @@
+<div *ngIf="loading">
+  Loading task...
+</div>
+
+<div *ngIf="!loading && task">
+
+  <h2>{{ task.title }}</h2>
+
+  <p>
+    <strong>Description:</strong>
+  </p>
+
+  <p>
+    {{ task.description || 'No description provided.' }}
+  </p>
+
+  <hr>
+
+  <p>
+    <strong>Priority:</strong>
+    {{ task.priority }}
+  </p>
+
+  <p>
+    <strong>Due Date:</strong>
+    {{ task.dueDate || 'Not set' }}
+  </p>
+
+  <hr>
+
+  <h3>Assign Task</h3>
+
+  <select [(ngModel)]="assigneeId">
+    <option value="">Select project member</option>
+
+    <option *ngFor="let m of members" [value]="m.userId">
+      {{ m.fullName }} ({{ m.role }})
+    </option>
+  </select>
+
+  <button (click)="AssignTask()" [disabled]="!assigneeId">
+    Assign
+  </button>
+
+  <button (click)="EditTask()">
+    Edit
+  </button>
+
+  <button (click)="DeleteTask()">
+    Delete
+  </button>
+
+  <button (click)="goBack()">
+    Back
+  </button>
+
+</div>

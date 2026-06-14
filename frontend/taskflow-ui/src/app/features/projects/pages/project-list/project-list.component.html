@@ -1,0 +1,29 @@
+<h2>Projects</h2>
+
+<div *ngIf="loading">
+    Loading projects.....
+</div>
+
+<div *ngIf="!loading && projects.length === 0">
+    No projects found
+</div>
+
+<ul *ngIf="!loading && projects.length > 0">
+  <li *ngFor="let project of projects">
+    <strong>{{ project.name }}</strong>
+    <span>({{ project.key }})</span>
+    <p>{{ project.description }}</p>
+
+    <button (click)="goToEdit(project.id)">
+        Edit
+    </button>
+
+    <button (click)="deleteProject(project.id)">
+        Delete
+    </button>
+
+    <button (click)="viewBoards(project.id)">
+    Boards
+    </button>
+  </li>
+</ul>

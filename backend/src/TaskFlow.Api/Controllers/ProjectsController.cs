@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Auth.Commands.CreateProject;
+using TaskFlow.Application.Features.Projects.Commands.AddProjectMember;
 using TaskFlow.Application.Features.Projects.Commands.DeleteProject;
+using TaskFlow.Application.Features.Projects.Commands.RemoveProjectMember;
 using TaskFlow.Application.Features.Projects.Commands.UpdateProject;
 using TaskFlow.Application.Features.Projects.Queries.GetProjectById;
+using TaskFlow.Application.Features.Projects.Queries.GetProjectMembers;
 using TaskFlow.Application.Features.Projects.Queries.GetProjects;
 
 namespace TaskFlow.Api.Controllers
@@ -56,6 +59,37 @@ namespace TaskFlow.Api.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             await _mediator.Send(new DeleteProjectCommand(id));
+
+            return NoContent();
+        }
+
+        [HttpPost("projectId={projectId:guid}/members")]
+        public async Task<IActionResult> AddMember(
+            Guid projectId,
+            AddProjectMemberCommand command)
+        {
+            if (projectId != command.ProjectId)
+                return BadRequest("ProjectId mismatch");
+
+            await _mediator.Send(command);
+
+            return Ok();
+        }
+
+        [HttpGet("projectId={projectId:guid}/members")]
+        public async Task<IActionResult> GetMembers(Guid projectId)
+        {
+            return Ok(await _mediator.Send(
+                new GetProjectMembersQuery(projectId)));
+        }
+
+        [HttpDelete("projectId={projectId:guid}/members/userId={userId:guid}")]
+        public async Task<IActionResult> RemoveMember(
+            Guid projectId,
+            Guid userId)
+        {
+            await _mediator.Send(
+                new RemoveProjectMemberCommand(projectId, userId));
 
             return NoContent();
         }

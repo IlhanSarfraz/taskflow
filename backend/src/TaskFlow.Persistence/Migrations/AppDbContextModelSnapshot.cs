@@ -113,6 +113,36 @@ namespace TaskFlow.Persistence.Migrations
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("TaskFlow.Domain.Entities.ProjectMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProjectMembers");
+                });
+
             modelBuilder.Entity("TaskFlow.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -267,6 +297,25 @@ namespace TaskFlow.Persistence.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("TaskFlow.Domain.Entities.ProjectMember", b =>
+                {
+                    b.HasOne("TaskFlow.Domain.Entities.Project", "Project")
+                        .WithMany("Members")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TaskFlow.Domain.Entities.User", "User")
+                        .WithMany("ProjectMemberships")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TaskFlow.Domain.Entities.RefreshToken", b =>
                 {
                     b.HasOne("TaskFlow.Domain.Entities.User", "User")
@@ -311,11 +360,15 @@ namespace TaskFlow.Persistence.Migrations
                 {
                     b.Navigation("Boards");
 
+                    b.Navigation("Members");
+
                     b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.User", b =>
                 {
+                    b.Navigation("ProjectMemberships");
+
                     b.Navigation("Projects");
 
                     b.Navigation("RefreshTokens");

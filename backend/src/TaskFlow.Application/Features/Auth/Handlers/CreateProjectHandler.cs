@@ -4,6 +4,7 @@ using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Application.Features.Auth.Commands.CreateProject;
 using TaskFlow.Application.Features.Auth.DTOs.Project;
 using TaskFlow.Domain.Entities;
+using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Application.Features.Auth.Handlers
 {
@@ -45,7 +46,16 @@ namespace TaskFlow.Application.Features.Auth.Handlers
 
             _context.Projects.Add(project);
 
-            await _context.SaveChangesAsync();
+            _context.ProjectMembers.Add(
+                new ProjectMember
+                {
+                    Project = project,
+                    UserId = _currentUserService.UserId,
+                    Role = ProjectMemberRole.Admin
+                });
+
+            await _context.SaveChangesAsync(
+                cancellationToken);
 
             return new ProjectResponse(
                 project.Id,
