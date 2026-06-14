@@ -19,6 +19,9 @@ namespace TaskFlow.Persistence.Configurations
                 .WithMany(x => x.Columns)
                 .HasForeignKey(x => x.BoardId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(x => new { x.BoardId, x.Order })
+                .IsUnique();
         }
     }
 }

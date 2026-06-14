@@ -52,6 +52,7 @@ namespace TaskFlow.Infrastructure
             services.AddScoped<ICookieService, CookieService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IProjectAuthorizationService, ProjectAuthorizationService>();
 
             return services;
         }
