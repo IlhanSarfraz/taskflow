@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Application.Features.Boards.DTOs;
 using TaskFlow.Domain.Entities;
+using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Application.Features.Boards.Commands.CreateBoard
 {
@@ -24,6 +25,17 @@ namespace TaskFlow.Application.Features.Boards.Commands.CreateBoard
             CreateBoardCommand request,
             CancellationToken cancellationToken)
         {
+            bool isAdmin = await _context.ProjectMembers
+            .AnyAsync(x =>
+                x.ProjectId == request.ProjectId &&
+                x.UserId == _currentUser.UserId &&
+                x.Role == ProjectMemberRole.Admin,
+                cancellationToken);
+
+            if (!isAdmin)
+                throw new UnauthorizedAccessException("You are not allowed to add members.");
+
+
             Project? project = await _context.Projects
                 .FirstOrDefaultAsync(x => x.Id == request.ProjectId &&
                 x.OwnerId == _currentUser.UserId,

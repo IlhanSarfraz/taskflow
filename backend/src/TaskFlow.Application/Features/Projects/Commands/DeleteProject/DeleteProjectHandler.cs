@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Domain.Entities;
+using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Application.Features.Projects.Commands.DeleteProject
 {
@@ -23,6 +24,17 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeleteProject
             DeleteProjectCommand request,
             CancellationToken cancellationToken)
         {
+
+            bool isAdmin = await _context.ProjectMembers
+                .AnyAsync(x =>
+                    x.ProjectId == request.Id &&
+                    x.UserId == _currentUser.UserId &&
+                    x.Role == ProjectMemberRole.Admin,
+                    cancellationToken);
+
+            if (!isAdmin)
+                throw new UnauthorizedAccessException("You are not allowed to add members.");
+
             Project? project = await _context.Projects
                 .FirstOrDefaultAsync(x => x.Id == request.Id &&
                 x.OwnerId == _currentUser.UserId,

@@ -31,6 +31,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.AssignTask
                     cancellationToken)
                 ?? throw new KeyNotFoundException("Task not found.");
 
+            bool memberExists = await _context.ProjectMembers
+                .AnyAsync(x =>
+                    x.ProjectId == task.ProjectId &&
+                    x.UserId == request.AssigneeId,
+                    cancellationToken);
+
+            if (!memberExists)
+                throw new InvalidOperationException(
+                    "User is not a member of this project.");
+
             task.AssigneeId = request.AssigneeId;
 
             await _context.SaveChangesAsync(cancellationToken);
