@@ -6,11 +6,16 @@ import { BoardService } from '../../services/board.service';
 import { BoardDetails } from '../../models/board-details.model';
 
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-board-details',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [
+    CommonModule,
+    DragDropModule,
+    FormsModule
+  ],
   templateUrl: './board-details.component.html',
   styleUrl: './board-details.component.scss',
 })
@@ -23,8 +28,10 @@ export class BoardDetailsComponent {
 
   board?: BoardDetails;
   loading = true;
-
-  connectedColumns: string[] = [];
+  newColumnName = '';
+  showCreateColumn = false;
+  editingColumnId: string | null = null;
+  editedColumnName = '';
 
   ngOnInit(): void {
     const boardId = this.route.snapshot.paramMap.get('boardId')!;
@@ -39,9 +46,6 @@ export class BoardDetailsComponent {
         next: (data) => {
           this.board = data;
           this.loading = false;
-
-          // IMPORTANT: connect all columns for cross-drop
-          this.connectedColumns = data.column.map(c => c.id);
 
           this.cdr.markForCheck();
         },
@@ -103,4 +107,114 @@ export class BoardDetailsComponent {
   openTask(taskId: string): void {
     this.router.navigate(['/tasks', taskId]);
   }
+
+  createColumn(): void {
+
+    if (!this.board || !this.newColumnName.trim()) {
+      return;
+    }
+
+    const nextOrder = this.board.column.length;
+
+    this.boardService.createColumn(
+      this.board.id,
+      {
+        boardId: this.board.id,
+        name: this.newColumnName,
+        order: nextOrder
+      }
+    )
+    .subscribe({
+      next: () => {
+
+        this.newColumnName = '';
+        this.showCreateColumn = false;
+
+        this.loadBoard(this.board!.id);
+      },
+      error: err => {
+        console.error(err);
+      }
+    });
+  }
+
+  startRenameColumn(
+    columnId: string,
+    currentName: string
+  ): void {
+
+    this.editingColumnId = columnId;
+    this.editedColumnName = currentName;
+  }
+
+  saveColumnName(columnId: string): void {
+
+    this.boardService.renameColumn(
+      columnId,
+      {
+        columnId,
+        name: this.editedColumnName
+      }
+    )
+    .subscribe({
+      next: () => {
+
+        this.editingColumnId = null;
+        this.loadBoard(this.board!.id);
+      },
+      error: err => console.error(err)
+    });
+  }
+
+  deleteColumn(columnId: string): void {
+
+    const confirmed = confirm(
+      'Delete this column?'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.boardService.deleteColumn(columnId)
+      .subscribe({
+        next: () => {
+          this.loadBoard(this.board!.id);
+        },
+        error: err => console.error(err)
+      });
+  }
+
+  dropColumn(
+    event: CdkDragDrop<any[]>
+  ): void {
+
+    if (!this.board) {
+      return;
+    }
+
+  moveItemInArray(
+    this.board.column,
+    event.previousIndex,
+    event.currentIndex
+  );
+
+  const orderedColumnIds =
+    this.board.column.map(x => x.id);
+
+  this.boardService.reorderColumns(
+    this.board.id,
+    {
+      boardId: this.board.id,
+      orderedColumnIds
+    }
+  )
+  .subscribe({
+    error: err => console.error(err)
+  });
+
+
+
+}
+
 }
