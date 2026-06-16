@@ -5,7 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BoardService } from '../../services/board.service';
 import { BoardDetails } from '../../models/board-details.model';
 
-import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import {
+  DragDropModule,
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem
+} from '@angular/cdk/drag-drop';
+
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -28,8 +34,10 @@ export class BoardDetailsComponent {
 
   board?: BoardDetails;
   loading = true;
+
   newColumnName = '';
   showCreateColumn = false;
+
   editingColumnId: string | null = null;
   editedColumnName = '';
 
@@ -46,7 +54,6 @@ export class BoardDetailsComponent {
         next: (data) => {
           this.board = data;
           this.loading = false;
-
           this.cdr.markForCheck();
         },
         error: (err) => {
@@ -56,13 +63,16 @@ export class BoardDetailsComponent {
       });
   }
 
-  onDrop(event: CdkDragDrop<any[]>, targetColumn: any): void {
+  // =========================
+  // TASK DRAG & DROP (FIXED)
+  // =========================
+  onDrop(event: CdkDragDrop<any[]>): void {
 
     const task = event.item.data;
 
     if (!task) return;
 
-    // same column reorder
+    // SAME COLUMN reorder
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -72,7 +82,12 @@ export class BoardDetailsComponent {
       return;
     }
 
-    // move between columns
+    // ✅ FIX: correct target column comes from container id
+    const targetColumnId = event.container.id;
+
+    console.log('TARGET COLUMN:', targetColumnId);
+    console.log('TASK:', task.id);
+
     transferArrayItem(
       event.previousContainer.data,
       event.container.data,
@@ -80,17 +95,45 @@ export class BoardDetailsComponent {
       event.currentIndex
     );
 
-    // backend sync
-    this.boardService.moveTask(task.id, targetColumn.id)
+    this.boardService.moveTask(task.id, targetColumnId)
       .subscribe({
         next: () => console.log('Task moved'),
         error: (err) => {
           console.error(err);
-          this.loadBoard(this.board!.id); // rollback safety
+          this.loadBoard(this.board!.id);
         }
       });
   }
 
+  // =========================
+  // COLUMN DRAG
+  // =========================
+  dropColumn(event: CdkDragDrop<any[]>): void {
+
+    if (!this.board) return;
+
+    moveItemInArray(
+      this.board.column,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    const orderedColumnIds = this.board.column.map(x => x.id);
+
+    this.boardService.reorderColumns(
+      this.board.id,
+      {
+        boardId: this.board.id,
+        orderedColumnIds
+      }
+    ).subscribe({
+      error: err => console.error(err)
+    });
+  }
+
+  // =========================
+  // NAVIGATION
+  // =========================
   openCreateTask(columnId: string): void {
     this.router.navigate([
       '/boards',
@@ -108,11 +151,12 @@ export class BoardDetailsComponent {
     this.router.navigate(['/tasks', taskId]);
   }
 
+  // =========================
+  // COLUMN CRUD
+  // =========================
   createColumn(): void {
 
-    if (!this.board || !this.newColumnName.trim()) {
-      return;
-    }
+    if (!this.board || !this.newColumnName.trim()) return;
 
     const nextOrder = this.board.column.length;
 
@@ -123,26 +167,17 @@ export class BoardDetailsComponent {
         name: this.newColumnName,
         order: nextOrder
       }
-    )
-    .subscribe({
+    ).subscribe({
       next: () => {
-
         this.newColumnName = '';
         this.showCreateColumn = false;
-
         this.loadBoard(this.board!.id);
       },
-      error: err => {
-        console.error(err);
-      }
+      error: err => console.error(err)
     });
   }
 
-  startRenameColumn(
-    columnId: string,
-    currentName: string
-  ): void {
-
+  startRenameColumn(columnId: string, currentName: string): void {
     this.editingColumnId = columnId;
     this.editedColumnName = currentName;
   }
@@ -155,10 +190,8 @@ export class BoardDetailsComponent {
         columnId,
         name: this.editedColumnName
       }
-    )
-    .subscribe({
+    ).subscribe({
       next: () => {
-
         this.editingColumnId = null;
         this.loadBoard(this.board!.id);
       },
@@ -168,53 +201,12 @@ export class BoardDetailsComponent {
 
   deleteColumn(columnId: string): void {
 
-    const confirmed = confirm(
-      'Delete this column?'
-    );
-
-    if (!confirmed) {
-      return;
-    }
+    if (!confirm('Delete this column?')) return;
 
     this.boardService.deleteColumn(columnId)
       .subscribe({
-        next: () => {
-          this.loadBoard(this.board!.id);
-        },
+        next: () => this.loadBoard(this.board!.id),
         error: err => console.error(err)
       });
   }
-
-  dropColumn(
-    event: CdkDragDrop<any[]>
-  ): void {
-
-    if (!this.board) {
-      return;
-    }
-
-  moveItemInArray(
-    this.board.column,
-    event.previousIndex,
-    event.currentIndex
-  );
-
-  const orderedColumnIds =
-    this.board.column.map(x => x.id);
-
-  this.boardService.reorderColumns(
-    this.board.id,
-    {
-      boardId: this.board.id,
-      orderedColumnIds
-    }
-  )
-  .subscribe({
-    error: err => console.error(err)
-  });
-
-
-
-}
-
 }

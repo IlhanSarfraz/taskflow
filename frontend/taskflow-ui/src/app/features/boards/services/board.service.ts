@@ -37,7 +37,7 @@ export class BoardService {
 
   moveTask(taskId: string, targetColumnId: string) {
     return this.api.put(
-      `Tasks/${taskId}/move`,
+      `Tasks/taskId=${taskId}/move`,
       { targetColumnId }
     );
   }

@@ -4,29 +4,27 @@
   Loading board...
 </div>
 
-<!-- ADD COLUMN -->
 <button (click)="showCreateColumn = !showCreateColumn">
   + Add Column
 </button>
 
 <div *ngIf="showCreateColumn">
-
   <input
     type="text"
     [(ngModel)]="newColumnName"
-    placeholder="Column name">
+    placeholder="Column name"
+  >
 
   <button (click)="createColumn()">
     Save
   </button>
-
 </div>
 
 <hr />
 
 <div *ngIf="!loading && board">
 
-  <!-- COLUMNS DRAG CONTAINER -->
+  <!-- COLUMNS CONTAINER -->
   <div
     cdkDropList
     cdkDropListOrientation="horizontal"
@@ -37,66 +35,46 @@
     <!-- COLUMN -->
     <div *ngFor="let column of board.column"
          cdkDrag
-         [cdkDragData]="column"
          cdkDragLockAxis="x"
          style="min-width: 250px; background: #f4f4f4; padding: 10px; border-radius: 8px;">
 
-      <!-- COLUMN HEADER -->
+      <!-- HEADER -->
       <div style="display: flex; justify-content: space-between; align-items: center;">
 
         <h3 *ngIf="editingColumnId !== column.id">
           {{ column.name }}
         </h3>
 
-        <!-- ACTIONS -->
-        <div style="display: flex; gap: 5px;">
-
-          <button (click)="startRenameColumn(column.id, column.name)">
-            ✏️
-          </button>
-
-          <button (click)="deleteColumn(column.id)">
-            🗑
-          </button>
-
+        <div>
+          <button (click)="startRenameColumn(column.id, column.name)">✏️</button>
+          <button (click)="deleteColumn(column.id)">🗑</button>
         </div>
 
       </div>
 
-      <!-- RENAME MODE -->
+      <!-- EDIT -->
       <div *ngIf="editingColumnId === column.id">
-
         <input [(ngModel)]="editedColumnName">
-
-        <button (click)="saveColumnName(column.id)">
-          Save
-        </button>
-
+        <button (click)="saveColumnName(column.id)">Save</button>
       </div>
 
-      <!-- ADD TASK -->
       <button (click)="openCreateTask(column.id)">
         + Task
       </button>
 
-      <!-- EMPTY STATE -->
-      <div *ngIf="column.tasks.length === 0">
-        No tasks
-      </div>
-
-      <!-- TASK DROP LIST -->
+      <!-- TASK DROP AREA -->
       <div
         cdkDropList
-        [cdkDropListData]="column.tasks"
         [id]="column.id"
-        (cdkDropListDropped)="onDrop($event, column)"
+        [cdkDropListData]="column.tasks"
+        [cdkDropListConnectedTo]="board.column.map(c => c.id)"
+        (cdkDropListDropped)="onDrop($event)"
+        style="min-height: 50px; background: #e9e9e9; padding: 5px;"
       >
 
-        <!-- TASK -->
         <div *ngFor="let task of column.tasks"
              cdkDrag
              [cdkDragData]="task"
-             (click)="openTask(task.id)"
              style="background: white; margin: 5px 0; padding: 8px; border-radius: 5px; cursor: grab;">
 
           <strong>{{ task.title }}</strong>
