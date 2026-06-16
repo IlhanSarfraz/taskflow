@@ -7,10 +7,18 @@ import { FormsModule } from '@angular/forms';
 import { ProjectMemberService } from '../../../projects/services/project-member.service';
 import { ProjectMember } from '../../../projects/models/project-member.model';
 
+export interface CommentResponse {
+  id: string;
+  userId: string;
+  userName: string;
+  content: string;
+  createdAt: string;
+}
+
 @Component({
   selector: 'app-task-details',
-  imports: [CommonModule, FormsModule],
   standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './task-details.component.html',
   styleUrl: './task-details.component.scss',
 })
@@ -27,32 +35,39 @@ export class TaskDetailsComponent {
   loading = true;
   members: ProjectMember[] = [];
 
-ngOnInit(): void {
-  const taskId = this.route.snapshot.paramMap.get(`taskId`)!;
+  // COMMENTS
+  comments: CommentResponse[] = [];
+  newComment = '';
+  editingCommentId: string | null = null;
+  editedComment = '';
 
-  this.taskService.GetTaskById(taskId)
-    .subscribe({
-      next: (task) => {
-        this.task = task;
-        this.loading = false;
+  ngOnInit(): void {
+    const taskId = this.route.snapshot.paramMap.get('taskId')!;
 
-        this.loadMembers(task.projectId);
+    this.taskService.GetTaskById(taskId)
+      .subscribe({
+        next: (task) => {
+          this.task = task;
+          this.loading = false;
 
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        console.error(err);
-        this.loading = false;
-      }
-    });
-}
+          this.loadMembers(task.projectId);
+          this.loadComments(task.id);
 
-  goBack(): void{
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error(err);
+          this.loading = false;
+        }
+      });
+  }
+
+  goBack(): void {
     history.back();
   }
 
   EditTask(): void {
-    if(!this.task) return;
+    if (!this.task) return;
 
     this.router.navigate([
       `/tasks`,
@@ -62,7 +77,6 @@ ngOnInit(): void {
   }
 
   DeleteTask(): void {
-
     if (!this.task) return;
 
     const confirmDelete = confirm(
@@ -73,17 +87,12 @@ ngOnInit(): void {
 
     this.taskService.DeleteTask(this.task.id)
       .subscribe({
-        next: () => {
-          history.back(); 
-        },
-        error: (err) => {
-          console.error('DELETE TASK ERROR:', err);
-        }
+        next: () => history.back(),
+        error: (err) => console.error(err)
       });
   }
 
   AssignTask(): void {
-
     if (!this.task || !this.assigneeId) return;
 
     this.taskService.AssignTask(
@@ -92,31 +101,82 @@ ngOnInit(): void {
     )
     .subscribe({
       next: () => {
-
         alert('Task assigned successfully');
-
-        // refresh task details
         this.ReloadTask();
       },
-      error: (err) => {
-        console.error('ASSIGN ERROR:', err);
-      }
+      error: (err) => console.error(err)
     });
   }
 
   ReloadTask(): void {
-    this.taskService.GetTaskById(this.task?.id!)
+    this.taskService.GetTaskById(this.task!.id)
       .subscribe({
-        next: (task) => {
-          this.task = task;
-        }
+        next: (task) => this.task = task
       });
   }
 
   loadMembers(projectId: string) {
-  this.memberService.getMembers(projectId)
-    .subscribe(res =>{
-      this.members = res;
-    }); 
+    this.memberService.getMembers(projectId)
+      .subscribe(res => this.members = res);
+  }
+
+  // =========================
+  // COMMENTS
+  // =========================
+
+  loadComments(taskId: string): void {
+    this.taskService.GetComments(taskId)
+      .subscribe({
+        next: (res) => this.comments = res,
+        error: (err) => console.error(err)
+      });
+  }
+
+  addComment(): void {
+    if (!this.task || !this.newComment.trim()) return;
+
+    this.taskService.CreateComment(this.task.id, {
+      content: this.newComment
+    }).subscribe({
+      next: (res) => {
+        this.comments.unshift(res);
+        this.newComment = '';
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  startEdit(comment: CommentResponse): void {
+    this.editingCommentId = comment.id;
+    this.editedComment = comment.content;
+  }
+
+  saveEdit(commentId: string): void {
+    this.taskService.UpdateComment(commentId, {
+      content: this.editedComment
+    }).subscribe({
+      next: () => {
+        const c = this.comments.find(x => x.id === commentId);
+        if (c) c.content = this.editedComment;
+
+        this.editingCommentId = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  deleteComment(commentId: string): void {
+    if (!confirm('Delete this comment?')) return;
+
+    this.taskService.DeleteComment(commentId)
+      .subscribe({
+        next: () => {
+          this.comments = this.comments.filter(x => x.id !== commentId);
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error(err)
+      });
   }
 }
