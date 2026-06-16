@@ -2,14 +2,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Tasks.Commands.AssignTask;
+using TaskFlow.Application.Features.Tasks.Commands.CreateComment;
 using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
+using TaskFlow.Application.Features.Tasks.Commands.DeleteComment;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
+using TaskFlow.Application.Features.Tasks.Commands.UpdateComment;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
 using TaskFlow.Application.Features.Tasks.Dtos;
 using TaskFlow.Application.Features.Tasks.Queries.GetMyTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetProjectTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
+using TaskFlow.Application.Features.Tasks.Queries.GetTaskComments;
 using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Api.Controllers
@@ -33,7 +37,7 @@ namespace TaskFlow.Api.Controllers
             return Ok(await _mediator.Send(command));
         }
 
-        [HttpPut("{taskId:guid}/move")]
+        [HttpPut("taskId={taskId:guid}/move")]
         public async Task<IActionResult> Move(
             Guid taskId,
             MoveTaskRequest request)
@@ -46,13 +50,13 @@ namespace TaskFlow.Api.Controllers
             return NoContent();
         }
 
-        [HttpGet("{taskId:guid}")]
+        [HttpGet("taskId={taskId:guid}")]
         public async Task<IActionResult> GetById(Guid taskId)
         {
             return Ok(await _mediator.Send(new GetTaskByIdQuery(taskId)));
         }
 
-        [HttpPut("{taskId:guid}")]
+        [HttpPut("taskId={taskId:guid}")]
         public async Task<IActionResult> Update(
             Guid taskId,
             UpdateTaskRequest request)
@@ -68,7 +72,7 @@ namespace TaskFlow.Api.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{taskId:guid}")]
+        [HttpDelete("taskId={taskId:guid}")]
         public async Task<IActionResult> Delete(Guid taskId)
         {
             await _mediator.Send(
@@ -77,7 +81,7 @@ namespace TaskFlow.Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("{taskId:guid}/assign")]
+        [HttpPut("taskId={taskId:guid}/assign")]
         public async Task<IActionResult> Assign(
             Guid taskId,
             AssignTaskRequest request)
@@ -94,7 +98,7 @@ namespace TaskFlow.Api.Controllers
             return Ok(await _mediator.Send(new GetMyTasksQuery()));
         }
 
-        [HttpGet("/api/projects/{projectId:guid}/tasks")]
+        [HttpGet("/api/projects/projectId={projectId:guid}/tasks")]
         public async Task<IActionResult> GetProjectTasks(
             Guid projectId,
             Guid? columnId,
@@ -109,6 +113,48 @@ namespace TaskFlow.Api.Controllers
                     priority,
                     page,
                     pageSize)));
+        }
+
+        [HttpPost("taskId={taskId:guid}/comments")]
+        public async Task<IActionResult> CreateComment(
+            Guid taskId,
+            CreateCommentRequest request)
+        {
+            return Ok(await _mediator.Send(
+                new CreateCommentCommand(
+                    taskId,
+                    request.Content)));
+        }
+
+        [HttpGet("taskId={taskId:guid}/comments")]
+        public async Task<IActionResult> GetComments(
+            Guid taskId)
+        {
+            return Ok(await _mediator.Send(
+                new GetTaskCommentsQuery(taskId)));
+        }
+
+        [HttpDelete("comments/commentId={commentId:guid}")]
+        public async Task<IActionResult> DeleteComment(
+            Guid commentId)
+        {
+            await _mediator.Send(
+                new DeleteCommentCommand(commentId));
+
+            return NoContent();
+        }
+
+        [HttpPut("comments/commentId={commentId:guid}")]
+        public async Task<IActionResult> UpdateComment(
+            Guid commentId,
+            UpdateCommentRequest request)
+        {
+            await _mediator.Send(
+                new UpdateCommentCommand(
+                    commentId,
+                    request.Content));
+
+            return NoContent();
         }
     }
 }

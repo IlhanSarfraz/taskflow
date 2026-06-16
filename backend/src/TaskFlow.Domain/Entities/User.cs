@@ -25,5 +25,8 @@ namespace TaskFlow.Domain.Entities
 
         public ICollection<ProjectMember> ProjectMemberships { get; set; }
             = new List<ProjectMember>();
+
+        public ICollection<TaskComment> Comments { get; set; }
+            = new List<TaskComment>();
     }
 }

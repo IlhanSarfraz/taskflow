@@ -4,5 +4,6 @@
     {
         Task EnsureMemberAsync(Guid projectId, CancellationToken ct = default);
         Task EnsureAdminAsync(Guid projectId, CancellationToken ct = default);
+        Task EnsureTaskMemberAsync(Guid taskId, CancellationToken cancellationToken);
     }
 }
