@@ -17,28 +17,43 @@ public sealed class ProjectAuthorizationService : IProjectAuthorizationService
         _currentUser = currentUser;
     }
 
-    public async Task EnsureMemberAsync(Guid projectId, CancellationToken ct = default)
+    public async Task EnsureMemberAsync(Guid projectId, CancellationToken cancellationToken = default)
     {
         bool isMember = await _context.ProjectMembers
             .AnyAsync(x =>
                 x.ProjectId == projectId &&
                 x.UserId == _currentUser.UserId,
-                ct);
+                cancellationToken);
 
         if (!isMember)
-            throw new UnauthorizedAccessException("You are not a project member.");
+            throw new UnauthorizedAccessException(
+                "You are not a project member.");
     }
 
-    public async Task EnsureAdminAsync(Guid projectId, CancellationToken ct = default)
+    public async Task EnsureAdminAsync(Guid projectId, CancellationToken cancellationToken = default)
     {
         bool isAdmin = await _context.ProjectMembers
             .AnyAsync(x =>
                 x.ProjectId == projectId &&
                 x.UserId == _currentUser.UserId &&
                 x.Role == ProjectMemberRole.Admin,
-                ct);
+                cancellationToken);
 
         if (!isAdmin)
-            throw new UnauthorizedAccessException("Admin access required.");
+            throw new UnauthorizedAccessException(
+                "Admin access required.");
+    }
+
+    public async Task EnsureTaskMemberAsync(Guid taskId, CancellationToken cancellationToken)
+    {
+        bool isMember = await _context.ProjectMembers
+            .AnyAsync(x =>
+                x.Project.Tasks.Any(t => t.Id == taskId) &&
+                x.UserId == _currentUser.UserId,
+                cancellationToken);
+
+        if (!isMember)
+            throw new UnauthorizedAccessException(
+                "You are not a project member");
     }
 }

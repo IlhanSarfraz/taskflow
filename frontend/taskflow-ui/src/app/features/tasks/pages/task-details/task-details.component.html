@@ -6,28 +6,17 @@
 
   <h2>{{ task.title }}</h2>
 
-  <p>
-    <strong>Description:</strong>
-  </p>
-
-  <p>
-    {{ task.description || 'No description provided.' }}
-  </p>
+  <p><strong>Description:</strong></p>
+  <p>{{ task.description || 'No description provided.' }}</p>
 
   <hr>
 
-  <p>
-    <strong>Priority:</strong>
-    {{ task.priority }}
-  </p>
-
-  <p>
-    <strong>Due Date:</strong>
-    {{ task.dueDate || 'Not set' }}
-  </p>
+  <p><strong>Priority:</strong> {{ task.priority }}</p>
+  <p><strong>Due Date:</strong> {{ task.dueDate || 'Not set' }}</p>
 
   <hr>
 
+  <!-- ASSIGN -->
   <h3>Assign Task</h3>
 
   <select [(ngModel)]="assigneeId">
@@ -42,16 +31,49 @@
     Assign
   </button>
 
-  <button (click)="EditTask()">
-    Edit
-  </button>
+  <button (click)="EditTask()">Edit</button>
+  <button (click)="DeleteTask()">Delete</button>
+  <button (click)="goBack()">Back</button>
 
-  <button (click)="DeleteTask()">
-    Delete
-  </button>
+  <hr>
 
-  <button (click)="goBack()">
-    Back
-  </button>
+  <!-- COMMENTS -->
+  <h3>Comments</h3>
+
+  <div style="margin-bottom: 10px;">
+    <textarea
+      [(ngModel)]="newComment"
+      placeholder="Write a comment..."
+      rows="3"
+      style="width: 100%;">
+    </textarea>
+
+    <button (click)="addComment()" [disabled]="!newComment.trim()">
+      Add Comment
+    </button>
+  </div>
+
+  <div *ngFor="let c of comments" style="border-bottom: 1px solid #ddd; padding: 10px;">
+
+    <strong>{{ c.userName }}</strong>
+    <small> - {{ c.createdAt | date:'short' }}</small>
+
+    <!-- VIEW -->
+    <div *ngIf="editingCommentId !== c.id">
+      <p>{{ c.content }}</p>
+
+      <button (click)="startEdit(c)">Edit</button>
+      <button (click)="deleteComment(c.id)">Delete</button>
+    </div>
+
+    <!-- EDIT -->
+    <div *ngIf="editingCommentId === c.id">
+      <textarea [(ngModel)]="editedComment" rows="2" style="width: 100%;"></textarea>
+
+      <button (click)="saveEdit(c.id)">Save</button>
+      <button (click)="editingCommentId = null">Cancel</button>
+    </div>
+
+  </div>
 
 </div>

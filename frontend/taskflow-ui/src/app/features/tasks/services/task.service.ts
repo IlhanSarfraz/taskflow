@@ -5,6 +5,9 @@ import { Observable } from "rxjs";
 import { TaskResponse } from "../models/task-response";
 import { TaskDetails } from "../models/task-details";
 import { UpdateTaskRequest } from "../models/update-task-request";
+import { CommentResponse } from "../models/comment-response";
+import { CreateCommentRequest } from "../models/create-comment-request";
+import { UpdateCommentRequest } from "../models/update-comment-request";
 
 @Injectable({
     providedIn: `root`
@@ -23,7 +26,7 @@ export class TaskService{
 
     GetTaskById(taskId: string){
         return this.api.get<TaskDetails>(
-            `Tasks/${taskId}`,
+            `Tasks/taskId=${taskId}`,
         )
     }
 
@@ -31,20 +34,20 @@ export class TaskService{
         taskId: string,
         request: UpdateTaskRequest){
             return this.api.put(
-                `Tasks/${taskId}`,
+                `Tasks/taskId=${taskId}`,
                 request
             );
     }
 
     DeleteTask(taskId: string){
         return this.api.delete(
-            `Tasks/${taskId}`
+            `Tasks/taskId=${taskId}`
         )
     }
 
     AssignTask(taskId: string, assigneeId: string) {
     return this.api.put(
-        `Tasks/${taskId}/assign`,
+        `Tasks/taskId=${taskId}/assign`,
         { assigneeId }
     );
     }
@@ -53,5 +56,31 @@ export class TaskService{
         return this.api.get<TaskDetails[]>(
             `Tasks/my`
         );
+    }
+
+    CreateComment(taskId: string, request: CreateCommentRequest) {
+    return this.api.post<CommentResponse>(
+        `Tasks/taskId=${taskId}/comments`,
+        request
+    );
+    }
+
+    GetComments(taskId: string) {
+    return this.api.get<CommentResponse[]>(
+        `Tasks/taskId=${taskId}/comments`
+    );
+    }
+
+    UpdateComment(commentId: string, request: UpdateCommentRequest) {
+    return this.api.put(
+        `Tasks/comments/commentId=${commentId}`,
+        request
+    );
+    }
+
+    DeleteComment(commentId: string) {
+    return this.api.delete(
+        `Tasks/comments/commentId=${commentId}`
+    );
     }
 }
