@@ -37,18 +37,18 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
                             c.Id,
                             c.Name,
                             c.Order,
-                            c.Tasks.Select(t => new TaskSummaryResponse(
-                                t.Id,
-                                t.Title,
-                                t.Priority
-                            )).ToList()
-                        ))
-                        .ToList()
-                ))
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (board is null)
-                throw new KeyNotFoundException("Board not found.");
+                            c.Tasks.
+                                OrderBy(t => t.Order).
+                                Select(t => new TaskSummaryResponse(
+                                    t.Id,
+                                    t.Title,
+                                    t.Priority
+                                )).ToList()
+                            ))
+                            .ToList()
+                    ))
+                    .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new KeyNotFoundException("Board not found.");
 
             return board;
         }

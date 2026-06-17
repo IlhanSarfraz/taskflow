@@ -23,6 +23,9 @@ namespace TaskFlow.Persistence.Configurations
             builder.HasOne(x => x.BoardColumn)
                 .WithMany(x => x.Tasks)
                 .HasForeignKey(x => x.BoardColumnId);
+
+            builder.Property(x => x.Order)
+                .IsRequired();
         }
     }
 }

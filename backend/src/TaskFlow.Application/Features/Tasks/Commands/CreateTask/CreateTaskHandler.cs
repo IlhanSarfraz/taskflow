@@ -44,6 +44,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateTask
             if (!columnExists)
                 throw new KeyNotFoundException("Column not found.");
 
+            int nextOrder = await _context.Tasks
+                .Where(x => x.BoardColumnId == request.BoardColumnId)
+                .CountAsync(cancellationToken);
+
             TaskItem task = new()
             {
                 Title = request.Title,
@@ -51,7 +55,8 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateTask
                 Priority = request.Priority,
                 DueDate = request.DueDate,
                 ProjectId = request.ProjectId,
-                BoardColumnId = request.BoardColumnId
+                BoardColumnId = request.BoardColumnId,
+                Order = nextOrder
             };
 
             _context.Tasks.Add(task);

@@ -42,7 +42,12 @@ namespace TaskFlow.Application.Features.Tasks.Commands.MoveTask
                 throw new InvalidOperationException(
                     "Cannot move task across projects.");
 
+            int nextOrder = await _context.Tasks
+                .Where(x => x.BoardColumnId == request.TargetColumnId)
+                .CountAsync(cancellationToken);
+
             task.BoardColumnId = targetColumn.Id;
+            task.Order = nextOrder;
 
             await _context.SaveChangesAsync(cancellationToken);
         }
