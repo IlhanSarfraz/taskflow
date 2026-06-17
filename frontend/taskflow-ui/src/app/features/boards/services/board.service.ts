@@ -78,4 +78,13 @@ export class BoardService {
     );
   }
 
+  reorderTasks(columnId: string, orderedTaskIds: string[]) {
+    return this.api.put(
+      `Columns/columnId=${columnId}/Tasks/reorder`,
+      {
+        columnId,
+        orderedTaskIds
+      }
+    );
+  }
 }

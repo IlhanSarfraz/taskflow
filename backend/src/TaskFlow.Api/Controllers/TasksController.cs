@@ -158,7 +158,7 @@ namespace TaskFlow.Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("/api/columns/{columnId:guid}/tasks/reorder")]
+        [HttpPut("/api/columns/columnId={columnId:guid}/tasks/reorder")]
         public async Task<IActionResult> ReorderTasks(
             Guid columnId,
             ReorderTasksCommand command)
