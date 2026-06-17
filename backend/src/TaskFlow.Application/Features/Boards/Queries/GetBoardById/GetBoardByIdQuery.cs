@@ -6,3 +6,4 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
     public sealed record GetBoardByIdQuery(Guid BoardId)
         : IRequest<BoardDetailsResponse>;
 }
+

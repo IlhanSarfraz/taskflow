@@ -31,18 +31,52 @@ namespace TaskFlow.Application.Features.Tasks.Commands.MoveTask
                     cancellationToken)
                 ?? throw new KeyNotFoundException("Task not found.");
 
-            BoardColumn? targetColumn = await _context.BoardColumns
-                .Include(x => x.Board)
+            BoardColumn targetColumn = await _context.BoardColumns
                 .FirstOrDefaultAsync(
                     x => x.Id == request.TargetColumnId,
                     cancellationToken)
                 ?? throw new KeyNotFoundException("Target column not found.");
 
-            if (targetColumn.Board.ProjectId != task.ProjectId)
-                throw new InvalidOperationException(
-                    "Cannot move task across projects.");
+            bool sameProject = await _context.BoardColumns
+                .AnyAsync(x =>
+                    x.Id == request.TargetColumnId &&
+                    x.Board.ProjectId == task.ProjectId,
+                    cancellationToken);
 
-            task.BoardColumnId = targetColumn.Id;
+            if (!sameProject)
+                throw new InvalidOperationException("Cannot move across projects.");
+
+            // =========================
+            // OLD COLUMN - REMOVE + REINDEX
+            // =========================
+            List<TaskItem> oldColumnTasks = await _context.Tasks
+                .Where(x => x.BoardColumnId == task.BoardColumnId)
+                .OrderBy(x => x.Order)
+                .ToListAsync(cancellationToken);
+
+            oldColumnTasks.RemoveAll(x => x.Id == task.Id);
+
+            for (int i = 0; i < oldColumnTasks.Count; i++)
+                oldColumnTasks[i].Order = i;
+
+            // =========================
+            // MOVE TASK
+            // =========================
+            task.BoardColumnId = request.TargetColumnId;
+
+            // =========================
+            // TARGET COLUMN - ADD + REINDEX
+            // =========================
+            List<TaskItem> targetTasks = await _context.Tasks
+                .Where(x => x.BoardColumnId == request.TargetColumnId)
+                .OrderBy(x => x.Order)
+                .ToListAsync(cancellationToken);
+
+            targetTasks.RemoveAll(x => x.Id == task.Id);
+            targetTasks.Add(task);
+
+            for (int i = 0; i < targetTasks.Count; i++)
+                targetTasks[i].Order = i;
 
             await _context.SaveChangesAsync(cancellationToken);
         }

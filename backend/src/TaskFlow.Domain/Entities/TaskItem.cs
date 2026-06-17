@@ -11,6 +11,8 @@ namespace TaskFlow.Domain.Entities
 
         public TaskPriority Priority { get; set; }
 
+        public int Order { get; set; }
+
         public DateTime? DueDate { get; set; }
 
         public Guid ProjectId { get; set; }
