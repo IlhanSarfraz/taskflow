@@ -37,11 +37,14 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
                             c.Id,
                             c.Name,
                             c.Order,
-                            c.Tasks.Select(t => new TaskSummaryResponse(
-                                t.Id,
-                                t.Title,
-                                t.Priority
-                            )).ToList()
+                            c.Tasks
+                                .OrderBy(t => t.Order)
+                                .Select(t => new TaskSummaryResponse(
+                                    t.Id,
+                                    t.Title,
+                                    t.Priority
+                                ))
+                                .ToList()
                         ))
                         .ToList()
                 ))

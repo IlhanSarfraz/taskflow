@@ -49,22 +49,21 @@ export class BoardDetailsComponent {
   loadBoard(boardId: string): void {
     this.loading = true;
 
-    this.boardService.getBoardById(boardId)
-      .subscribe({
-        next: (data) => {
-          this.board = data;
-          this.loading = false;
-          this.cdr.markForCheck();
-        },
-        error: (err) => {
-          console.error(err);
-          this.loading = false;
-        }
-      });
+    this.boardService.getBoardById(boardId).subscribe({
+      next: (data) => {
+        this.board = data;
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+      }
+    });
   }
 
   // =========================
-  // TASK DRAG & DROP (FIXED)
+  // TASK MOVE
   // =========================
   onDrop(event: CdkDragDrop<any[]>): void {
 
@@ -72,38 +71,52 @@ export class BoardDetailsComponent {
 
     if (!task) return;
 
-    // SAME COLUMN reorder
+    const targetColumnId = event.container.id;
+
+    // =========================
+    // SAME COLUMN → REORDER TASKS
+    // =========================
     if (event.previousContainer === event.container) {
+
       moveItemInArray(
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
+
+      const orderedTaskIds = event.container.data.map(t => t.id);
+
+      this.boardService.reorderTasks(targetColumnId, orderedTaskIds)
+        .subscribe({
+          next: () => console.log('Tasks reordered'),
+          error: (err) => {
+            console.error(err);
+            this.loadBoard(this.board!.id); // rollback
+          }
+        });
+
       return;
     }
 
-    // ✅ FIX: correct target column comes from container id
-    const targetColumnId = event.container.id;
+  // =========================
+  // MOVE BETWEEN COLUMNS
+  // =========================
+  transferArrayItem(
+    event.previousContainer.data,
+    event.container.data,
+    event.previousIndex,
+    event.currentIndex
+  );
 
-    console.log('TARGET COLUMN:', targetColumnId);
-    console.log('TASK:', task.id);
-
-    transferArrayItem(
-      event.previousContainer.data,
-      event.container.data,
-      event.previousIndex,
-      event.currentIndex
-    );
-
-    this.boardService.moveTask(task.id, targetColumnId)
-      .subscribe({
-        next: () => console.log('Task moved'),
-        error: (err) => {
-          console.error(err);
-          this.loadBoard(this.board!.id);
-        }
-      });
-  }
+  this.boardService.moveTask(task.id, targetColumnId)
+    .subscribe({
+      next: () => console.log('Task moved'),
+      error: (err) => {
+        console.error(err);
+        this.loadBoard(this.board!.id);
+      }
+    });
+}
 
   // =========================
   // COLUMN DRAG
@@ -132,7 +145,7 @@ export class BoardDetailsComponent {
   }
 
   // =========================
-  // NAVIGATION
+  // TASK NAVIGATION
   // =========================
   openCreateTask(columnId: string): void {
     this.router.navigate([

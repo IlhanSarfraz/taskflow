@@ -7,6 +7,7 @@ using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteComment;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
+using TaskFlow.Application.Features.Tasks.Commands.ReorderTasks;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateComment;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
 using TaskFlow.Application.Features.Tasks.Dtos;
@@ -154,6 +155,15 @@ namespace TaskFlow.Api.Controllers
                     commentId,
                     request.Content));
 
+            return NoContent();
+        }
+
+        [HttpPut("/api/columns/columnId={columnId:guid}/tasks/reorder")]
+        public async Task<IActionResult> ReorderTasks(
+            Guid columnId,
+            ReorderTasksCommand command)
+        {
+            await _mediator.Send(command with { ColumnId = columnId });
             return NoContent();
         }
     }
