@@ -25,7 +25,6 @@ export class CreateProjectComponent {
 
   submit(): void{
     if(this.form.invalid) return;
-
     this.loading = true;
 
     this.projectService.CreateProject(this.form.value as any)
