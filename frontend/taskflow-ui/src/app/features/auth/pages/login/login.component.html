@@ -1,21 +1,98 @@
-<h2>Login</h2>
-
-<form [formGroup]="form" (ngSubmit)="login()">
-    <div>
-        <label>Email</label>
-        <input type="email" formControlName="email">
+<div class="flex h-screen font-serif">
+  <!-- Left Half -->
+<div class="w-1/2 bg-[#253900] text-white flex flex-col p-10 pl-20">
+    
+    <!-- Top -->
+    <div class="flex items-center gap-3 mt-10">
+        <div class="w-10 h-10 bg-[#08CB00] rounded-lg"></div>
+        <h1 class="text-3xl">TaskFlow</h1>
     </div>
 
-    <div>
-        <label>Password</label>
-        <input type="password" formControlName="password">
+    <!-- Hero -->
+    <div class="mt-20">
+        <h2 class="text-5xl leading-tight">
+            Plan. Track. <br/>
+            Ship faster.
+        </h2>
+
+        <p class="mt-6 w-[70%] text-gray-400 text-2xl">
+            Boards, tasks, and team collaboration — built for teams that move quick.
+        </p>
     </div>
     
-    <button type="submit">Login</button>
+    <!-- Card -->
+    <div class="mt-10 bg-[#1f1f1f] rounded-xl p-5 space-y-4 w-[70%]">
+        <div class="flex items-center gap-3">
+            <span class="w-4 h-4 bg-red-500 rounded-full"></span>
+            <p class="text-xl">Fix Login redirect bug</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="w-4 h-4 bg-orange-500 rounded-full"></span>
+            <p class="text-xl">Design board drag animation</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="w-4 h-4 bg-green-500 rounded-full"></span>
+            <p class="text-xl">Write API documentation</p>
+        </div>
+    </div>
 
-</form>
+    <!-- Footer -->
+    <div class="mt-20 text-xl text-gray-400">
+        Trusted by fast-moving product teams
+    </div>
+  </div>
 
-<p>
-    Don't have an account?
-    <a routerLink="/register">Register</a>
-</p>
+    <!-- Right Half -->
+    <div class="w-1/2 bg-[#111111] flex items-center justify-center p-10">
+
+      <form
+        class="w-full max-w-md"
+        [formGroup]="form"
+        (ngSubmit)="login()"
+      >
+        <!-- Title -->
+        <h2 class="text-3xl font-semibold text-white">Welcome back</h2>
+        <p class="text-gray-400 mt-2">Sign in to continue to your workspace</p>
+
+        <!-- Email -->
+        <div class="mt-6">
+        <label class="text-sm text-gray-300">Email</label>
+        <input 
+            type="email" 
+            formControlName="email"
+            placeholder="you@example.com"
+            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"/>
+        </div>
+
+        <!-- Password -->
+        <div class="mt-4">
+        <label class="text-sm text-gray-300">Password</label>
+        <input 
+            type="password" 
+            formControlName="password"
+            placeholder="**************"
+            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"/>
+        </div>
+
+        <!-- Forgot -->
+        <div class="text-right mt-2">
+            <a href="#" class="text-green-500 text-sm hover:underline">
+                Forgot password?
+            </a>
+        </div>
+
+        <!-- Button -->
+        <button 
+            type="submit"
+            class="w-full mt-6 bg-green-500 hover:bg-green-600 text-black font-semibold py-3 rounded-lg transition">
+                Log in
+        </button>
+
+        <!-- Register -->
+        <p class="text-center text-sm text-gray-400 mt-4">
+            Don't have an account?
+            <a class="text-green-500 hover:underline" routerLink="/register">Register</a>
+        </p>
+    </form>
+</div>
+</div>
