@@ -23,6 +23,10 @@ namespace TaskFlow.Domain.Entities
 
         public BoardColumn BoardColumn { get; set; } = null!;
         public Guid? AssigneeId { get; set; }
+
+        public ICollection<TaskAssignment> Assignments { get; set; }
+            = new List<TaskAssignment>();
+
         public ICollection<TaskComment> Comments { get; set; }
             = new List<TaskComment>();
     }

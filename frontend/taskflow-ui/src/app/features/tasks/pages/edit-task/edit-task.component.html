@@ -1,44 +1,95 @@
-<div *ngIf="loading">
-  Loading...
+<div class="edit-task max-w-2xl">
+
+  <div *ngIf="pageLoading" class="space-y-4 animate-pulse">
+    <div class="h-4 w-24 bg-[#1a1a1a] rounded"></div>
+    <div class="h-8 w-48 bg-[#1a1a1a] rounded"></div>
+    <div class="h-64 bg-[#1a1a1a] rounded-xl"></div>
+  </div>
+
+  <p *ngIf="!pageLoading && loadError" class="text-red-400 text-sm">
+    {{ loadError }}
+  </p>
+
+  <ng-container *ngIf="!pageLoading && !loadError">
+
+    <a
+      [routerLink]="['/tasks', taskId]"
+      class="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-6 transition"
+    >
+      <i class="fa-solid fa-arrow-left text-xs"></i>
+      Back to task
+    </a>
+
+    <h1 class="text-2xl font-semibold text-white mb-8">Edit task</h1>
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="save()"
+      class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6 space-y-5"
+    >
+
+      <div>
+        <label class="text-sm text-gray-300">Title</label>
+        <input
+          type="text"
+          placeholder="Task title"
+          formControlName="title"
+          class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white outline-none border border-gray-700 focus:border-[#08CB00]"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-300">Description</label>
+        <textarea
+          placeholder="Describe the task..."
+          formControlName="description"
+          rows="5"
+          class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white outline-none border border-gray-700 focus:border-[#08CB00] resize-none"
+        ></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label class="text-sm text-gray-300">Priority</label>
+          <select
+            formControlName="priority"
+            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white outline-none border border-gray-700 focus:border-[#08CB00]"
+          >
+            <option [ngValue]="1">Low</option>
+            <option [ngValue]="2">Medium</option>
+            <option [ngValue]="3">High</option>
+            <option [ngValue]="4">Critical</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-sm text-gray-300">Due date</label>
+          <input
+            type="date"
+            formControlName="dueDate"
+            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white outline-none border border-gray-700 focus:border-[#08CB00]"
+          />
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button
+          type="submit"
+          [disabled]="saving || form.invalid"
+          class="px-6 py-2.5 rounded-lg bg-[#08CB00] hover:bg-green-600 text-black text-sm font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {{ saving ? 'Saving...' : 'Save changes' }}
+        </button>
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-6 py-2.5 rounded-lg border border-gray-700 text-gray-300 hover:text-white text-sm transition"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </form>
+
+  </ng-container>
 </div>
-
-<form
-  *ngIf="!loading"
-  [formGroup]="form"
-  (ngSubmit)="save()">
-
-  <h2>Edit Task</h2>
-
-  <input
-    type="text"
-    placeholder="Title"
-    formControlName="title">
-
-  <br><br>
-
-  <textarea
-    placeholder="Description"
-    formControlName="description">
-  </textarea>
-
-  <br><br>
-
-  <select formControlName="priority">
-    <option [value]="1">Low</option>
-    <option [value]="2">Medium</option>
-    <option [value]="3">High</option>
-  </select>
-
-  <br><br>
-
-  <input
-    type="date"
-    formControlName="dueDate">
-
-  <br><br>
-
-  <button type="submit">
-    Save Changes
-  </button>
-
-</form>

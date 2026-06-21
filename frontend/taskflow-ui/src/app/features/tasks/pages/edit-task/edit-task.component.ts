@@ -1,16 +1,16 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { TaskService } from '../../services/task.service';
 import { CommonModule } from '@angular/common';
+import { UpdateTaskRequest } from '../../models/update-task-request';
 
 @Component({
   selector: 'app-edit-task',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './edit-task.component.html',
-  styleUrl: './edit-task.component.scss'
 })
 export class EditTaskComponent {
 
@@ -18,20 +18,35 @@ export class EditTaskComponent {
   private readonly taskService = inject(TaskService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   taskId!: string;
-  loading = true;
+  pageLoading = true;
+  saving = false;
+  loadError = '';
 
   form = this.fb.group({
     title: ['', Validators.required],
     description: [''],
-    priority: [1, Validators.required],
+    priority: [2, Validators.required],
     dueDate: ['']
   });
 
   ngOnInit(): void {
-
     this.taskId = this.route.snapshot.paramMap.get('taskId')!;
+
+    if (!this.taskId) {
+      this.loadError = 'Invalid task id.';
+      this.pageLoading = false;
+      return;
+    }
+
+    this.loadTask();
+  }
+
+  loadTask(): void {
+    this.pageLoading = true;
+    this.loadError = '';
 
     this.taskService.GetTaskById(this.taskId)
       .subscribe({
@@ -39,26 +54,34 @@ export class EditTaskComponent {
           this.form.patchValue({
             title: task.title,
             description: task.description ?? '',
-            priority: task.priority,
+            priority: Number(task.priority),
             dueDate: task.dueDate
               ? task.dueDate.split('T')[0]
               : ''
           });
 
-          this.loading = false;
+          this.pageLoading = false;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           console.error(err);
-          this.loading = false;
+          this.loadError = 'Could not load task. It may not exist or you may not have access.';
+          this.pageLoading = false;
+          this.cdr.markForCheck();
         }
       });
   }
 
-  save(): void {
+  cancel(): void {
+    this.router.navigate(['/tasks', this.taskId]);
+  }
 
+  save(): void {
     if (this.form.invalid) return;
 
-    const request = {
+    this.saving = true;
+
+    const request: UpdateTaskRequest = {
       title: this.form.value.title ?? '',
       description: this.form.value.description ?? '',
       priority: Number(this.form.value.priority),
@@ -67,18 +90,17 @@ export class EditTaskComponent {
         : null
     };
 
-    this.taskService.UpdateTask(
-      this.taskId,
-      request
-    )
-    .subscribe({
-      next: () => {
-        this.router.navigate([
-          '/tasks',
-          this.taskId
-        ]);
-      },
-      error: console.error
-    });
+    this.taskService.UpdateTask(this.taskId, request)
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.router.navigate(['/tasks', this.taskId]);
+        },
+        error: (err) => {
+          console.error(err);
+          this.saving = false;
+          this.cdr.markForCheck();
+        }
+      });
   }
 }

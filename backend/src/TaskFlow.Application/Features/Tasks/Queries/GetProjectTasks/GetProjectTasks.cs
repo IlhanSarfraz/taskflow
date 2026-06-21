@@ -51,8 +51,17 @@ namespace TaskFlow.Application.Features.Tasks.Queries.GetProjectTasks
                     x.Priority,
                     x.DueDate,
                     x.ProjectId,
+                    x.Project.Name,
                     x.BoardColumnId,
-                    x.AssigneeId))
+                    x.BoardColumn.Name,
+                    x.BoardColumn.BoardId,
+                    x.Assignments
+                        .OrderBy(a => a.User.FirstName)
+                        .Select(a => new TaskAssigneeDto(
+                            a.UserId,
+                            a.User.FirstName + " " + a.User.LastName,
+                            (a.User.FirstName.Substring(0, 1) + a.User.LastName.Substring(0, 1)).ToUpper()))
+                        .ToList()))
                 .ToListAsync(cancellationToken);
         }
     }

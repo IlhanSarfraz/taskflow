@@ -13,6 +13,7 @@ namespace TaskFlow.Application.Common.Interfaces
         DbSet<TaskItem> Tasks { get; }
         DbSet<ProjectMember> ProjectMembers { get; }
         DbSet<TaskComment> TaskComments { get; }
+        DbSet<TaskAssignment> TaskAssignments { get; }
 
         Task<int> SaveChangesAsync(
             CancellationToken cancellationToken = default);

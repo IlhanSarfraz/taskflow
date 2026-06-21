@@ -9,6 +9,9 @@ namespace TaskFlow.Application.Features.Tasks.Dtos
         TaskPriority Priority,
         DateTime? DueDate,
         Guid ProjectId,
+        string ProjectName,
         Guid BoardColumnId,
-        Guid? AssigneeId);
+        string ColumnName,
+        Guid BoardId,
+        IReadOnlyList<TaskAssigneeDto> Assignees);
 }

@@ -13,6 +13,7 @@ using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
 using TaskFlow.Application.Features.Tasks.Dtos;
 using TaskFlow.Application.Features.Tasks.Queries.GetMyTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetProjectTasks;
+using TaskFlow.Application.Features.Tasks.Queries.GetTaskDetailPage;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskComments;
 using TaskFlow.Domain.Enums;
@@ -49,6 +50,12 @@ namespace TaskFlow.Api.Controllers
                     request.TargetColumnId));
 
             return NoContent();
+        }
+
+        [HttpGet("taskId={taskId:guid}/detail")]
+        public async Task<IActionResult> GetDetailPage(Guid taskId)
+        {
+            return Ok(await _mediator.Send(new GetTaskDetailPageQuery(taskId)));
         }
 
         [HttpGet("taskId={taskId:guid}")]
@@ -88,7 +95,7 @@ namespace TaskFlow.Api.Controllers
             AssignTaskRequest request)
         {
             await _mediator.Send(
-                new AssignTaskCommand(taskId, request.AssigneeId));
+                new AssignTaskCommand(taskId, request.AssigneeIds));
 
             return NoContent();
         }

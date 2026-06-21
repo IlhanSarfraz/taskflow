@@ -8,6 +8,7 @@ import { UpdateTaskRequest } from "../models/update-task-request";
 import { CommentResponse } from "../models/comment-response";
 import { CreateCommentRequest } from "../models/create-comment-request";
 import { UpdateCommentRequest } from "../models/update-comment-request";
+import { TaskDetailPage } from "../models/task-detail-page.model";
 
 @Injectable({
     providedIn: `root`
@@ -30,6 +31,12 @@ export class TaskService{
         )
     }
 
+    GetTaskDetailPage(taskId: string): Observable<TaskDetailPage> {
+        return this.api.get<TaskDetailPage>(
+            `Tasks/taskId=${taskId}/detail`
+        );
+    }
+
     UpdateTask(
         taskId: string,
         request: UpdateTaskRequest){
@@ -45,10 +52,10 @@ export class TaskService{
         )
     }
 
-    AssignTask(taskId: string, assigneeId: string) {
+    AssignTask(taskId: string, assigneeIds: string[]) {
     return this.api.put(
         `Tasks/taskId=${taskId}/assign`,
-        { assigneeId }
+        { assigneeIds }
     );
     }
 

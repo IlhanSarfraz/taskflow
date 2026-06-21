@@ -44,13 +44,18 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
                                     t.Title,
                                     t.Priority,
                                     t.DueDate,
-                                    t.AssigneeId == null
-                                        ? null
-                                        : _context.Users
-                                            .Where(u => u.Id == t.AssigneeId)
-                                            .Select(u =>
-                                                (u.FirstName.Substring(0, 1) + u.LastName.Substring(0, 1)).ToUpper())
-                                            .FirstOrDefault()
+                                    t.Assignments
+                                        .OrderBy(a => a.User.FirstName)
+                                        .Select(a =>
+                                            (a.User.FirstName.Substring(0, 1) + a.User.LastName.Substring(0, 1)).ToUpper())
+                                        .FirstOrDefault()
+                                        ?? (t.AssigneeId == null
+                                            ? null
+                                            : _context.Users
+                                                .Where(u => u.Id == t.AssigneeId)
+                                                .Select(u =>
+                                                    (u.FirstName.Substring(0, 1) + u.LastName.Substring(0, 1)).ToUpper())
+                                                .FirstOrDefault())
                                 ))
                                 .ToList()
                         ))

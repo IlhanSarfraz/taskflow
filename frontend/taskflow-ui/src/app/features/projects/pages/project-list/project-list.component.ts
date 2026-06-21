@@ -9,7 +9,6 @@ import { Router, RouterLink } from '@angular/router';
   imports: [CommonModule, RouterLink],
   standalone: true,
   templateUrl: './project-list.component.html',
-  styleUrl: './project-list.component.scss',
 })
 export class ProjectListComponent {
   private readonly projectService = inject(ProjectService)

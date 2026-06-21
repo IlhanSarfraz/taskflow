@@ -8,7 +8,6 @@ import { Router, RouterLink } from '@angular/router';
   imports: [ReactiveFormsModule, RouterLink],
   standalone: true,
   templateUrl: './create-project.component.html',
-  styleUrl: './create-project.component.scss',
 })
 export class CreateProjectComponent {
   private fb = inject(FormBuilder);

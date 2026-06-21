@@ -54,6 +54,12 @@ export const routes: Routes = [
             .then(m => m.BoardListComponent)
       },
       {
+        path: 'projects/:projectId/members',
+        loadComponent: () =>
+          import('./features/projects/pages/project-members/project-members.component')
+            .then(m => m.ProjectMembersComponent)
+      },
+      {
         path: 'boards/:boardId',
         loadComponent: () =>
           import('./features/boards/pages/board-details/board-details.component')
@@ -72,22 +78,16 @@ export const routes: Routes = [
             .then(m => m.MyTasksComponent)
       },
       {
-        path: 'tasks/:taskId',
-        loadComponent: () =>
-          import('./features/tasks/pages/task-details/task-details.component')
-            .then(m => m.TaskDetailsComponent)
-      },
-      {
         path: 'tasks/:taskId/edit',
         loadComponent: () =>
           import('./features/tasks/pages/edit-task/edit-task.component')
             .then(m => m.EditTaskComponent)
       },
       {
-        path: 'projects/:projectId/members',
+        path: 'tasks/:taskId',
         loadComponent: () =>
-          import('./features/projects/pages/project-members/project-members.component')
-            .then(m => m.ProjectMembersComponent)
+          import('./features/tasks/pages/task-details/task-details.component')
+            .then(m => m.TaskDetailsComponent)
       }
     ]
   }

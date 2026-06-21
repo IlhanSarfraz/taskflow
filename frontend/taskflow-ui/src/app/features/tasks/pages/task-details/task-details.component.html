@@ -1,79 +1,230 @@
-<div *ngIf="loading">
-  Loading task...
-</div>
+<div class="task-details">
 
-<div *ngIf="!loading && task">
-
-  <h2>{{ task.title }}</h2>
-
-  <p><strong>Description:</strong></p>
-  <p>{{ task.description || 'No description provided.' }}</p>
-
-  <hr>
-
-  <p><strong>Priority:</strong> {{ task.priority }}</p>
-  <p><strong>Due Date:</strong> {{ task.dueDate || 'Not set' }}</p>
-
-  <hr>
-
-  <!-- ASSIGN -->
-  <h3>Assign Task</h3>
-
-  <select [(ngModel)]="assigneeId">
-    <option value="">Select project member</option>
-
-    <option *ngFor="let m of members" [value]="m.userId">
-      {{ m.fullName }} ({{ m.role }})
-    </option>
-  </select>
-
-  <button (click)="AssignTask()" [disabled]="!assigneeId">
-    Assign
-  </button>
-
-  <button (click)="EditTask()">Edit</button>
-  <button (click)="DeleteTask()">Delete</button>
-  <button (click)="goBack()">Back</button>
-
-  <hr>
-
-  <!-- COMMENTS -->
-  <h3>Comments</h3>
-
-  <div style="margin-bottom: 10px;">
-    <textarea
-      [(ngModel)]="newComment"
-      placeholder="Write a comment..."
-      rows="3"
-      style="width: 100%;">
-    </textarea>
-
-    <button (click)="addComment()" [disabled]="!newComment.trim()">
-      Add Comment
-    </button>
+  <!-- Loading -->
+  <div *ngIf="loading" class="space-y-6 animate-pulse">
+    <div class="h-4 w-32 bg-[#1a1a1a] rounded"></div>
+    <div class="h-10 w-3/5 max-w-xl bg-[#1a1a1a] rounded"></div>
+    <div class="h-4 w-56 bg-[#1a1a1a] rounded"></div>
+    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_300px] gap-8 mt-10">
+      <div class="space-y-6">
+        <div class="h-16 bg-[#1a1a1a] rounded-xl"></div>
+        <div class="h-48 bg-[#1a1a1a] rounded-xl"></div>
+      </div>
+      <div class="h-80 bg-[#1a1a1a] rounded-xl"></div>
+    </div>
   </div>
 
-  <div *ngFor="let c of comments" style="border-bottom: 1px solid #ddd; padding: 10px;">
+  <ng-container *ngIf="!loading && task">
 
-    <strong>{{ c.userName }}</strong>
-    <small> - {{ c.createdAt | date:'short' }}</small>
+    <!-- Back -->
+    <a
+      [routerLink]="['/boards', task.boardId]"
+      class="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm transition"
+    >
+      <i class="fa-solid fa-arrow-left text-xs"></i>
+      Back to board
+    </a>
 
-    <!-- VIEW -->
-    <div *ngIf="editingCommentId !== c.id">
-      <p>{{ c.content }}</p>
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4 mt-5 mb-10">
+      <div class="min-w-0">
+        <h1 class="text-[28px] font-semibold text-white leading-snug">
+          {{ task.title }}
+        </h1>
+        <p class="text-gray-500 text-sm mt-2">
+          {{ task.projectName }} / {{ task.columnName }}
+        </p>
+      </div>
 
-      <button (click)="startEdit(c)">Edit</button>
-      <button (click)="deleteComment(c.id)">Delete</button>
+      <div class="flex items-center gap-2 shrink-0">
+        <button
+          (click)="EditTask()"
+          class="px-4 py-2 rounded-lg border border-gray-700 text-white text-sm hover:border-gray-500 transition"
+        >
+          Edit
+        </button>
+        <button
+          (click)="DeleteTask()"
+          class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-700 text-gray-400 hover:text-red-400 transition"
+          title="Delete task"
+        >
+          <i class="fa-regular fa-trash-can"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- EDIT -->
-    <div *ngIf="editingCommentId === c.id">
-      <textarea [(ngModel)]="editedComment" rows="2" style="width: 100%;"></textarea>
+    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_300px] gap-8 items-start">
 
-      <button (click)="saveEdit(c.id)">Save</button>
-      <button (click)="editingCommentId = null">Cancel</button>
+      <!-- Main column -->
+      <div class="min-w-0 space-y-10">
+
+        <p class="text-gray-400 text-[15px] leading-7">
+          {{ task.description || 'No description provided.' }}
+        </p>
+
+        <!-- Comments -->
+        <section>
+          <h2 class="text-white font-semibold text-base mb-4">Comments</h2>
+
+          <div class="space-y-3 mb-5">
+            <article
+              *ngFor="let c of comments"
+              class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-4"
+            >
+              <div class="flex gap-3">
+                <div class="w-9 h-9 rounded-full bg-[#08CB00] text-black text-xs font-bold flex items-center justify-center shrink-0">
+                  {{ getInitials(c.userName) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="text-white text-sm font-medium">{{ c.userName }}</span>
+                    <span class="text-gray-600 text-xs">{{ getRelativeTime(c.createdAt) }}</span>
+                  </div>
+
+                  <ng-container *ngIf="editingCommentId !== c.id">
+                    <p class="text-gray-400 text-sm mt-1.5 leading-relaxed">{{ c.content }}</p>
+                    <div class="flex gap-3 mt-2 opacity-0 hover:opacity-100 focus-within:opacity-100 transition">
+                      <button (click)="startEdit(c)" class="text-xs text-gray-500 hover:text-white">Edit</button>
+                      <button (click)="deleteComment(c.id)" class="text-xs text-gray-500 hover:text-red-400">Delete</button>
+                    </div>
+                  </ng-container>
+
+                  <div *ngIf="editingCommentId === c.id" class="mt-2">
+                    <textarea
+                      [(ngModel)]="editedComment"
+                      rows="2"
+                      class="w-full p-2.5 rounded-lg bg-[#111] text-white text-sm border border-gray-700 outline-none focus:border-[#08CB00] resize-none"
+                    ></textarea>
+                    <div class="flex gap-2 mt-2">
+                      <button (click)="saveEdit(c.id)" class="px-3 py-1 text-xs font-semibold rounded-md bg-[#08CB00] text-black">Save</button>
+                      <button (click)="editingCommentId = null" class="px-3 py-1 text-xs text-gray-500">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <p *ngIf="comments.length === 0" class="text-gray-600 text-sm">
+              No comments yet.
+            </p>
+          </div>
+
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [(ngModel)]="newComment"
+              placeholder="Add a comment..."
+              (keyup.enter)="addComment()"
+              class="flex-1 h-11 px-4 rounded-xl bg-[#1a1a1a] border border-gray-800 text-white text-sm outline-none focus:border-gray-600 placeholder:text-gray-600"
+            />
+            <button
+              (click)="addComment()"
+              [disabled]="!newComment.trim()"
+              class="w-11 h-11 rounded-xl bg-[#08CB00] hover:bg-green-600 text-black flex items-center justify-center transition disabled:opacity-30"
+            >
+              <i class="fa-solid fa-paper-plane text-sm"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- Attachments -->
+        <section>
+          <h2 class="text-white font-semibold text-base mb-4">Attachments</h2>
+          <p class="text-gray-600 text-sm mb-4">No attachments yet.</p>
+          <button
+            type="button"
+            disabled
+            class="w-full max-w-md py-4 rounded-xl border border-dashed border-gray-700 text-gray-500 text-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+          >
+            <i class="fa-solid fa-upload"></i>
+            Upload file
+          </button>
+        </section>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 space-y-6 xl:sticky xl:top-6">
+
+        <div>
+          <p class="text-gray-500 text-sm mb-2">Priority</p>
+          <span
+            class="inline-block text-xs font-semibold px-2.5 py-1 rounded-full"
+            [ngClass]="getPriorityClasses(task.priority)"
+          >
+            {{ getPriorityLabel(task.priority) }}
+          </span>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm mb-2">Due date</p>
+          <div *ngIf="task.dueDate" class="flex items-center gap-2 text-white text-sm">
+            <i class="fa-regular fa-calendar text-gray-500"></i>
+            <span>{{ task.dueDate | date:'MMM d, y' }}</span>
+          </div>
+          <span *ngIf="!task.dueDate" class="text-gray-600 text-sm">Not set</span>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm mb-3">Assignee</p>
+
+          <div *ngIf="task.assignees.length > 0" class="space-y-3 mb-4">
+            <div
+              *ngFor="let assignee of task.assignees"
+              class="flex items-center gap-3 group"
+            >
+              <div class="w-9 h-9 rounded-full bg-[#08CB00] text-black text-xs font-bold flex items-center justify-center shrink-0">
+                {{ assignee.initials }}
+              </div>
+              <span class="text-white text-sm flex-1 truncate">{{ assignee.fullName }}</span>
+              <button
+                (click)="removeAssignee(assignee.userId)"
+                [disabled]="assigning"
+                class="opacity-0 group-hover:opacity-100 text-gray-500 hover:text-red-400 text-xs transition disabled:opacity-30"
+                title="Remove"
+              >
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <p *ngIf="task.assignees.length === 0" class="text-gray-600 text-sm mb-3">Unassigned</p>
+
+          <select
+            [(ngModel)]="selectedMemberId"
+            [disabled]="assigning || availableMembers.length === 0"
+            class="w-full h-10 px-3 rounded-lg bg-[#111] border border-gray-700 text-white text-sm outline-none focus:border-gray-500 disabled:opacity-50"
+          >
+            <option value="">
+              {{ availableMembers.length === 0 ? 'No members available' : 'Select member' }}
+            </option>
+            <option *ngFor="let m of availableMembers" [value]="m.userId">
+              {{ m.fullName }}
+            </option>
+          </select>
+
+          <button
+            (click)="addAssignee()"
+            [disabled]="!selectedMemberId || assigning"
+            class="w-full mt-3 h-10 rounded-lg bg-[#08CB00] hover:bg-green-600 text-black text-sm font-semibold transition disabled:opacity-40"
+          >
+            {{ assigning ? 'Saving...' : 'Assign' }}
+          </button>
+        </div>
+
+        <hr class="border-gray-800" />
+
+        <div>
+          <p class="text-gray-500 text-sm mb-1">Column</p>
+          <p class="text-white text-sm">{{ task.columnName }}</p>
+        </div>
+
+        <div>
+          <p class="text-gray-500 text-sm mb-1">Project</p>
+          <p class="text-white text-sm">{{ task.projectName }}</p>
+        </div>
+
+      </aside>
     </div>
 
-  </div>
-
+  </ng-container>
 </div>
