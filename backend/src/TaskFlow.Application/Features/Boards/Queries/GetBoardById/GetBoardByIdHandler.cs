@@ -42,7 +42,15 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
                                 .Select(t => new TaskSummaryResponse(
                                     t.Id,
                                     t.Title,
-                                    t.Priority
+                                    t.Priority,
+                                    t.DueDate,
+                                    t.AssigneeId == null
+                                        ? null
+                                        : _context.Users
+                                            .Where(u => u.Id == t.AssigneeId)
+                                            .Select(u =>
+                                                (u.FirstName.Substring(0, 1) + u.LastName.Substring(0, 1)).ToUpper())
+                                            .FirstOrDefault()
                                 ))
                                 .ToList()
                         ))

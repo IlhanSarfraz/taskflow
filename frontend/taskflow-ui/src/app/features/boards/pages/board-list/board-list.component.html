@@ -1,33 +1,66 @@
-<h2>Boards</h2>
+<div class="p-2">
+  <button
+    routerLink="/projects"
+    class="flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-6"
+  >
+    <i class="fa-solid fa-arrow-left"></i>
+    Back to projects
+  </button>
 
-<div *ngIf="loading">
-  Loading boards...
-</div>
+  <h2 class="text-2xl font-semibold text-white">Boards</h2>
+  <p class="text-gray-400 mt-1">Boards for this project</p>
 
-<div *ngIf="!loading && boards.length === 0">
-  No boards found for this project.
-</div>
+  <div *ngIf="loading" class="text-gray-400 mt-6">
+    Loading boards...
+  </div>
 
-<ul *ngIf="!loading && boards.length > 0">
-  <li *ngFor="let board of boards">
+  <div *ngIf="!loading && boards.length === 0" class="text-gray-400 mt-6">
+    No boards found for this project.
+  </div>
 
-    {{ board.name }}
+  <div
+    *ngIf="!loading && boards.length > 0"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6"
+  >
+    <div
+      *ngFor="let board of boards"
+      class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 flex flex-col justify-between"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-[#08CB00] rounded-lg flex items-center justify-center text-black">
+          <i class="fa-solid fa-table-columns"></i>
+        </div>
+        <strong class="text-white text-lg">{{ board.name }}</strong>
+      </div>
 
-    <button (click)="openBoard(board.id)">
+      <button
+        (click)="openBoard(board.id)"
+        class="w-full mt-5 bg-[#08CB00] hover:bg-green-600 text-black font-semibold py-2 rounded-lg transition"
+      >
         Open Board
+      </button>
+    </div>
+  </div>
+
+  <!-- Create Board -->
+  <div class="max-w-md mt-10 bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+    <h3 class="text-lg font-semibold text-white">Create Board</h3>
+
+    <div class="mt-4">
+      <label class="text-sm text-gray-300">Board name</label>
+      <input
+        type="text"
+        placeholder="e.g. Sprint 1"
+        [formControl]="boardForm.controls.name"
+        class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"
+      />
+    </div>
+
+    <button
+      (click)="createBoard()"
+      class="w-full mt-4 bg-[#08CB00] hover:bg-green-600 text-black font-semibold py-3 rounded-lg transition"
+    >
+      Create Board
     </button>
-
-    </li>
-</ul>
-
-<h3>Create Board</h3>
-
-<input
-  type="text"
-  placeholder="Board name"
-  [formControl]="boardForm.controls.name"
-/>
-
-<button (click)="createBoard()">
-  Create Board
-</button>
+  </div>
+</div>

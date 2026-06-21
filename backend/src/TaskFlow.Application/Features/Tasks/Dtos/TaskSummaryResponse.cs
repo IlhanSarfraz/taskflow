@@ -5,5 +5,7 @@ namespace TaskFlow.Application.Features.Tasks.Dtos
     public sealed record TaskSummaryResponse(
         Guid Id,
         string Title,
-        TaskPriority Priority);
+        TaskPriority Priority,
+        DateTime? DueDate,
+        string? AssigneeInitials);
 }

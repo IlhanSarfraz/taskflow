@@ -13,6 +13,7 @@ import {
 } from '@angular/cdk/drag-drop';
 
 import { FormsModule } from '@angular/forms';
+import { TaskSummary } from '../../models/task-summary.model';
 
 @Component({
   selector: 'app-board-details',
@@ -40,6 +41,50 @@ export class BoardDetailsComponent {
 
   editingColumnId: string | null = null;
   editedColumnName = '';
+  selectedTaskId: string | null = null;
+  columnMenuOpenId: string | null = null;
+
+  get totalTaskCount(): number {
+    return this.board?.column.reduce((sum, col) => sum + col.tasks.length, 0) ?? 0;
+  }
+
+  get columnCount(): number {
+    return this.board?.column.length ?? 0;
+  }
+
+  getPriorityLabel(priority: number): string {
+    const labels: Record<number, string> = {
+      1: 'Low',
+      2: 'Medium',
+      3: 'High',
+      4: 'Critical'
+    };
+    return labels[priority] ?? 'Medium';
+  }
+
+  getPriorityClasses(priority: number): string {
+    const classes: Record<number, string> = {
+      1: 'bg-green-950 text-green-400',
+      2: 'bg-amber-950 text-amber-400',
+      3: 'bg-red-950 text-red-400',
+      4: 'bg-red-950 text-red-400'
+    };
+    return classes[priority] ?? 'bg-amber-950 text-amber-400';
+  }
+
+  selectTask(task: TaskSummary): void {
+    this.selectedTaskId = task.id;
+    this.openTask(task.id);
+  }
+
+  toggleColumnMenu(columnId: string, event: Event): void {
+    event.stopPropagation();
+    this.columnMenuOpenId = this.columnMenuOpenId === columnId ? null : columnId;
+  }
+
+  closeColumnMenu(): void {
+    this.columnMenuOpenId = null;
+  }
 
   ngOnInit(): void {
     const boardId = this.route.snapshot.paramMap.get('boardId')!;
@@ -73,9 +118,7 @@ export class BoardDetailsComponent {
 
     const targetColumnId = event.container.id;
 
-    // =========================
     // SAME COLUMN → REORDER TASKS
-    // =========================
     if (event.previousContainer === event.container) {
 
       moveItemInArray(
@@ -91,32 +134,44 @@ export class BoardDetailsComponent {
           next: () => console.log('Tasks reordered'),
           error: (err) => {
             console.error(err);
-            this.loadBoard(this.board!.id); // rollback
+            this.loadBoard(this.board!.id);
           }
         });
 
       return;
     }
 
-  // =========================
-  // MOVE BETWEEN COLUMNS
-  // =========================
-  transferArrayItem(
-    event.previousContainer.data,
-    event.container.data,
-    event.previousIndex,
-    event.currentIndex
-  );
+    // MOVE BETWEEN COLUMNS
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
 
-  this.boardService.moveTask(task.id, targetColumnId)
-    .subscribe({
-      next: () => console.log('Task moved'),
-      error: (err) => {
-        console.error(err);
-        this.loadBoard(this.board!.id);
-      }
-    });
-}
+    const sourceColumnId = event.previousContainer.id;
+
+    this.boardService.moveTask(task.id, targetColumnId)
+      .subscribe({
+        next: () => {
+          // After the move, also fix the order within the target column
+          const orderedTaskIds = event.container.data.map((t: any) => t.id);
+
+          this.boardService.reorderTasks(targetColumnId, orderedTaskIds)
+            .subscribe({
+              next: () => console.log('Task moved and reordered'),
+              error: (err) => {
+                console.error(err);
+                this.loadBoard(this.board!.id);
+              }
+            });
+        },
+        error: (err) => {
+          console.error(err);
+          this.loadBoard(this.board!.id);
+        }
+      });
+  }
 
   // =========================
   // COLUMN DRAG

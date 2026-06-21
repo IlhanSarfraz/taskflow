@@ -1,94 +1,186 @@
-<h2 *ngIf="board">{{ board.name }}</h2>
+<div class="board-details flex flex-col min-h-[calc(100vh-8rem)]" (click)="closeColumnMenu()">
 
-<div *ngIf="loading">
-  Loading board...
-</div>
-
-<button (click)="showCreateColumn = !showCreateColumn">
-  + Add Column
-</button>
-
-<div *ngIf="showCreateColumn">
-  <input
-    type="text"
-    [(ngModel)]="newColumnName"
-    placeholder="Column name"
-  >
-
-  <button (click)="createColumn()">
-    Save
-  </button>
-</div>
-
-<hr />
-
-<div *ngIf="!loading && board">
-
-  <!-- COLUMNS CONTAINER -->
-  <div
-    cdkDropList
-    cdkDropListOrientation="horizontal"
-    (cdkDropListDropped)="dropColumn($event)"
-    style="display: flex; gap: 20px;"
-  >
-
-    <!-- COLUMN -->
-    <div *ngFor="let column of board.column"
-         cdkDrag
-         cdkDragLockAxis="x"
-         style="min-width: 250px; background: #f4f4f4; padding: 10px; border-radius: 8px;">
-
-      <!-- HEADER -->
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-
-        <h3 *ngIf="editingColumnId !== column.id">
-          {{ column.name }}
-        </h3>
-
-        <div>
-          <button (click)="startRenameColumn(column.id, column.name)">✏️</button>
-          <button (click)="deleteColumn(column.id)">🗑</button>
-        </div>
-
-      </div>
-
-      <!-- EDIT -->
-      <div *ngIf="editingColumnId === column.id">
-        <input [(ngModel)]="editedColumnName">
-        <button (click)="saveColumnName(column.id)">Save</button>
-      </div>
-
-      <button (click)="openCreateTask(column.id)">
-        + Task
-      </button>
-
-      <!-- TASK DROP AREA -->
-      <div
-        cdkDropList
-        [id]="column.id"
-        [cdkDropListData]="column.tasks"
-        [cdkDropListConnectedTo]="board.column.map(c => c.id)"
-        (cdkDropListDropped)="onDrop($event)"
-        style="min-height: 50px; background: #e9e9e9; padding: 5px;"
-      >
-
-        <div *ngFor="let task of column.tasks"
-             cdkDrag
-             [cdkDragData]="task"
-             style="background: white; margin: 5px 0; padding: 8px; border-radius: 5px; cursor: grab;">
-
-          <strong>{{ task.title }}</strong>
-
-          <div>
-            Priority: {{ task.priority }}
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-gray-400">
+    Loading board...
   </div>
 
+  <ng-container *ngIf="!loading && board">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-semibold text-white tracking-tight">
+          {{ board.name }}
+        </h1>
+        <p class="text-gray-400 text-sm mt-1">
+          {{ totalTaskCount }} tasks across {{ columnCount }} columns
+        </p>
+      </div>
+
+      <button
+        (click)="showCreateColumn = !showCreateColumn"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-700 bg-[#1a1a1a] text-white text-sm hover:border-gray-500 transition shrink-0"
+      >
+        <i class="fa-solid fa-plus text-xs"></i>
+        Add column
+      </button>
+    </div>
+
+    <!-- Create column form -->
+    <div
+      *ngIf="showCreateColumn"
+      class="mb-6 flex items-center gap-3 max-w-md bg-[#1a1a1a] border border-gray-800 rounded-xl p-4"
+    >
+      <input
+        type="text"
+        [(ngModel)]="newColumnName"
+        placeholder="Column name"
+        class="flex-1 p-2.5 rounded-lg bg-[#121212] text-white text-sm outline-none border border-gray-700 focus:border-[#08CB00]"
+        (keyup.enter)="createColumn()"
+      />
+      <button
+        (click)="createColumn()"
+        class="px-4 py-2.5 rounded-lg bg-[#08CB00] hover:bg-green-600 text-black text-sm font-semibold transition"
+      >
+        Save
+      </button>
+      <button
+        (click)="showCreateColumn = false; newColumnName = ''"
+        class="px-3 py-2.5 rounded-lg text-gray-400 hover:text-white text-sm transition"
+      >
+        Cancel
+      </button>
+    </div>
+
+    <!-- Kanban board -->
+    <div class="board-scroll flex-1 overflow-x-auto pb-4">
+      <div
+        cdkDropList
+        cdkDropListOrientation="horizontal"
+        (cdkDropListDropped)="dropColumn($event)"
+        class="board-columns flex gap-4 min-h-full"
+      >
+        <div
+          *ngFor="let column of board.column"
+          cdkDrag
+          cdkDragLockAxis="x"
+          class="board-column flex flex-col w-72 shrink-0 bg-[#1a1a1a] rounded-xl border border-gray-800"
+        >
+          <!-- Column header -->
+          <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+              <ng-container *ngIf="editingColumnId !== column.id; else editColumnName">
+                <h3 class="text-white font-medium truncate">{{ column.name }}</h3>
+              </ng-container>
+              <ng-template #editColumnName>
+                <input
+                  [(ngModel)]="editedColumnName"
+                  class="flex-1 min-w-0 p-1.5 rounded bg-[#121212] text-white text-sm outline-none border border-gray-600"
+                  (keyup.enter)="saveColumnName(column.id)"
+                />
+              </ng-template>
+              <span class="shrink-0 text-xs text-gray-400 bg-[#121212] px-2 py-0.5 rounded-md">
+                {{ column.tasks.length }}
+              </span>
+            </div>
+
+            <div class="relative shrink-0 ml-2">
+              <button
+                (click)="toggleColumnMenu(column.id, $event)"
+                class="w-7 h-7 flex items-center justify-center rounded-md text-gray-500 hover:text-white hover:bg-[#252525] transition"
+              >
+                <i class="fa-solid fa-ellipsis text-sm"></i>
+              </button>
+
+              <div
+                *ngIf="columnMenuOpenId === column.id"
+                class="absolute right-0 top-8 z-20 w-40 bg-[#252525] border border-gray-700 rounded-lg shadow-xl py-1"
+                (click)="$event.stopPropagation()"
+              >
+                <button
+                  (click)="startRenameColumn(column.id, column.name); closeColumnMenu()"
+                  class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-[#333] transition"
+                >
+                  Rename
+                </button>
+                <button
+                  *ngIf="editingColumnId === column.id"
+                  (click)="saveColumnName(column.id); closeColumnMenu()"
+                  class="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-[#333] transition"
+                >
+                  Save name
+                </button>
+                <button
+                  (click)="deleteColumn(column.id); closeColumnMenu()"
+                  class="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-[#333] transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Task drop area -->
+          <div
+            cdkDropList
+            [id]="column.id"
+            [cdkDropListData]="column.tasks"
+            [cdkDropListConnectedTo]="board.column.map(c => c.id)"
+            (cdkDropListDropped)="onDrop($event)"
+            class="column-tasks flex-1 flex flex-col gap-3 p-3 min-h-[120px]"
+          >
+            <div
+              *ngFor="let task of column.tasks"
+              cdkDrag
+              [cdkDragData]="task"
+              (click)="selectTask(task)"
+              class="task-card bg-[#121212] rounded-lg p-3 cursor-grab border-2 transition-colors"
+              [class.border-[#08CB00]]="selectedTaskId === task.id"
+              [class.border-transparent]="selectedTaskId !== task.id"
+            >
+              <span
+                class="inline-block text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full mb-2"
+                [ngClass]="getPriorityClasses(task.priority)"
+              >
+                {{ getPriorityLabel(task.priority) }}
+              </span>
+
+              <p class="text-white font-semibold text-sm leading-snug">
+                {{ task.title }}
+              </p>
+
+              <div class="flex items-center justify-between mt-3">
+                <div
+                  *ngIf="task.dueDate"
+                  class="flex items-center gap-1.5 text-gray-500 text-xs"
+                >
+                  <i class="fa-regular fa-calendar text-[10px]"></i>
+                  <span>{{ task.dueDate | date:'MMM d' }}</span>
+                </div>
+                <div *ngIf="!task.dueDate"></div>
+
+                <div
+                  *ngIf="task.assigneeInitials"
+                  class="w-7 h-7 rounded-full bg-[#08CB00]/20 text-[#08CB00] text-[10px] font-bold flex items-center justify-center"
+                >
+                  {{ task.assigneeInitials }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add task -->
+          <button
+            (click)="openCreateTask(column.id)"
+            class="mx-3 mb-3 py-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-[#252525] text-sm transition flex items-center justify-center gap-1.5"
+          >
+            <i class="fa-solid fa-plus text-xs"></i>
+            Add task
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
 </div>

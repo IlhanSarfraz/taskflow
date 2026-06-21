@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { BoardService } from '../../services/board.service';
 import { BoardSummary } from '../../models/board-summary.model';
@@ -10,7 +10,7 @@ import { CreateBoardRequest } from '../../models/create-board-request.model';
 @Component({
   selector: 'app-board-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './board-list.component.html'
 })
 export class BoardListComponent {
@@ -53,10 +53,7 @@ export class BoardListComponent {
   }
 
   openBoard(boardId: string): void {
-    this.router.navigate([
-      '/boards',
-      boardId
-    ]);
+    this.router.navigate(['/boards', boardId]);
   }
 
   createBoard(): void {
