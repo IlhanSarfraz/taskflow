@@ -1,0 +1,34 @@
+@if(alert){
+
+<div
+  class="fixed top-4 right-4 z-50 w-96 bg-red-950 border border-red-700 text-red-100 rounded-lg p-4 shadow-lg"
+>
+
+  <div class="flex justify-between items-start">
+
+    <div>
+
+      <h3 class="font-semibold">
+        {{ alert.title }}
+      </h3>
+
+      <ul class="list-disc ml-5 mt-2">
+        @for(message of alert.messages; track message){
+          <li>{{ message }}</li>
+        }
+      </ul>
+
+    </div>
+
+    <button
+      (click)="close()"
+      class="text-red-300"
+    >
+      ✕
+    </button>
+
+  </div>
+
+</div>
+
+}
