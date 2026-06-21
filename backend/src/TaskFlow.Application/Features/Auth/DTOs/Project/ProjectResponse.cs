@@ -5,5 +5,6 @@
         string Name,
         string Key,
         string Description,
-        Guid OwnerId);
+        Guid OwnerId,
+        DateTime CreatedAt);
 }

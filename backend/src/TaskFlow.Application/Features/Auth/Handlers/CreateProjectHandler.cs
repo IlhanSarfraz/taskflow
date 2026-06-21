@@ -62,7 +62,8 @@ namespace TaskFlow.Application.Features.Auth.Handlers
                 project.Name,
                 project.Key,
                 project.Description,
-                project.OwnerId);
+                project.OwnerId,
+                project.CreatedAtUtc);
         }
     }
 }

@@ -6,7 +6,7 @@ import {
   RouterOutlet
 } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
-
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -23,6 +23,7 @@ export class DashboardLayoutComponent implements OnInit {
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location)
 
   collapsed = signal(false);
 
@@ -41,8 +42,16 @@ export class DashboardLayoutComponent implements OnInit {
         .toUpperCase();
   }
 
-  toggleSidebar(): void {
+  toggleSidebar() {
     this.collapsed.update(v => !v);
+  }
+
+  goBack() {
+    this.location.back();
+  }
+
+  goForward() {
+    this.location.forward();
   }
 
   logout(): void {

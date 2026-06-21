@@ -1,29 +1,70 @@
-<h2>Projects</h2>
+<div class="p-2">
+  <h2 class="text-2xl font-semibold text-white">Projects</h2>
+  <p class="text-gray-400 mt-1">All projects you own or are a member of</p>
 
-<div *ngIf="loading">
+  <div *ngIf="loading" class="text-gray-400 mt-6">
     Loading projects.....
-</div>
+  </div>
 
-<div *ngIf="!loading && projects.length === 0">
+  <div *ngIf="!loading && projects.length === 0" class="text-gray-400 mt-6">
     No projects found
+  </div>
+
+  <div
+    *ngIf="!loading && projects.length > 0"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6"
+  >
+    <div
+      *ngFor="let project of projects"
+      class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 flex flex-col justify-between"
+    >
+      <div>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-[#08CB00] rounded-lg flex items-center justify-center text-black font-bold text-sm">
+            {{ project.key }}
+          </div>
+          <strong class="text-white text-lg">{{ project.name }}</strong>
+        </div>
+
+        <p class="text-gray-400 text-sm mt-3">
+          {{ project.description }}
+        </p>
+
+        <p class="text-gray-500 text-xs mt-3">
+          Created {{ project.createdAt | date:'MMM d, y' }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 mt-4">
+        <button
+          (click)="viewBoards(project.id)"
+          class="flex-1 bg-[#08CB00] hover:bg-green-600 text-black font-semibold py-2 rounded-lg transition"
+        >
+          Open
+        </button>
+
+        <button
+          (click)="goToEdit(project.id)"
+          class="w-10 h-10 flex items-center justify-center bg-[#262626] hover:bg-[#333] text-gray-300 rounded-lg"
+        >
+          <i class="fa-solid fa-pen"></i>
+        </button>
+
+        <button
+          (click)="deleteProject(project.id)"
+          class="w-10 h-10 flex items-center justify-center bg-red-950 hover:bg-red-900 text-red-400 rounded-lg"
+        >
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating create button -->
+  <button
+    routerLink="/projects/create"
+    class="fixed bottom-8 right-8 w-14 h-14 bg-[#08CB00] hover:bg-green-600 text-black rounded-full flex items-center justify-center shadow-lg text-2xl"
+  >
+    <i class="fa-solid fa-plus"></i>
+  </button>
 </div>
-
-<ul *ngIf="!loading && projects.length > 0">
-  <li *ngFor="let project of projects">
-    <strong>{{ project.name }}</strong>
-    <span>({{ project.key }})</span>
-    <p>{{ project.description }}</p>
-
-    <button (click)="goToEdit(project.id)">
-        Edit
-    </button>
-
-    <button (click)="deleteProject(project.id)">
-        Delete
-    </button>
-
-    <button (click)="viewBoards(project.id)">
-    Boards
-    </button>
-  </li>
-</ul>

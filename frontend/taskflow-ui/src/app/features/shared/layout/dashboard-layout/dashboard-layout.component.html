@@ -142,19 +142,40 @@
       class="h-16 flex items-center justify-between px-6 border-b border-gray-800 bg-[#111111']"
     >
 
-      <!-- Search -->
-      <div
-        class="flex items-center bg-[#1e1e1e] rounded-lg px-3 py-2 w-80"
-      >
-        <i
-          class="fa-solid fa-magnifying-glass text-gray-500 mr-2"
-        ></i>
+      <!-- Nav + Search -->
+      <div class="flex items-center gap-4">
 
-        <input
-          type="text"
-          placeholder="Search tasks, projects..."
-          class="bg-transparent outline-none text-sm text-gray-200 w-full"
-        />
+        <!-- Back / Forward -->
+        <div class="flex items-center gap-1">
+          <button
+            (click)="goBack()"
+            class="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#1e1e1e] rounded-lg"
+          >
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <button
+            (click)="goForward()"
+            class="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#1e1e1e] rounded-lg"
+          >
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Search -->
+        <div
+          class="flex items-center bg-[#1e1e1e] rounded-lg px-3 py-2 w-80"
+        >
+          <i
+            class="fa-solid fa-magnifying-glass text-gray-500 mr-2"
+          ></i>
+
+          <input
+            type="text"
+            placeholder="Search tasks, projects..."
+            class="bg-transparent outline-none text-sm text-gray-200 w-full"
+          />
+        </div>
+
       </div>
 
       <!-- User -->

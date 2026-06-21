@@ -38,7 +38,8 @@ namespace TaskFlow.Application.Features.Projects.Queries.GetProjectById
                 project.Name,
                 project.Key,
                 project.Description,
-                project.OwnerId);
+                project.OwnerId,
+                project.CreatedAtUtc);
         }
     }
 }

@@ -41,7 +41,8 @@ namespace TaskFlow.Application.Features.Projects.Commands.UpdateProject
                 project.Name,
                 project.Key,
                 project.Description,
-                project.OwnerId);
+                project.OwnerId,
+                project.CreatedAtUtc);
         }
     }
 }

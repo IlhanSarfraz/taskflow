@@ -33,7 +33,8 @@ namespace TaskFlow.Application.Features.Projects.Queries.GetProjects
                     x.Name,
                     x.Key,
                     x.Description,
-                    x.OwnerId))
+                    x.OwnerId,
+                    x.CreatedAtUtc))
                 .ToListAsync(cancellationToken);
         }
     }
