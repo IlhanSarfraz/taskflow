@@ -3,5 +3,7 @@
     public sealed record LoginResponse(
         string AccessToken,
         Guid UserId,
-        string Email);
+        string Email,
+        string FirstName,
+        string LastName);
 }

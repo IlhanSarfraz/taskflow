@@ -36,6 +36,15 @@ export class AuthService{
                     this.tokenKey,
                     response.accessToken
                 );
+                localStorage.setItem(
+                    'firstName',
+                    response.firstName
+                );
+
+                localStorage.setItem(
+                    'lastName',
+                    response.lastName
+                );
             })
         );
     }

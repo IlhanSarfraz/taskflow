@@ -56,22 +56,49 @@
 
         <!-- Email -->
         <div class="mt-6">
-        <label class="text-sm text-gray-300">Email</label>
-        <input 
-            type="email" 
+        <div class="flex justify-between items-baseline">
+            <label class="text-sm text-gray-300">Email</label>
+
+            @if (form.get('email')?.touched && form.get('email')?.errors?.['required']) {
+            <span class="text-red-500 text-sm flex items-center gap-1">
+                <i class="fa-solid fa-circle-info"></i>
+                Email is required
+            </span>
+            } @else if (form.get('email')?.touched && form.get('email')?.errors?.['email']) {
+            <span class="text-red-500 text-sm flex items-center gap-1">
+                <i class="fa-solid fa-circle-info"></i>
+                Invalid email format
+            </span>
+            }
+        </div>
+
+        <input
+            type="email"
             formControlName="email"
             placeholder="you@example.com"
-            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"/>
+            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"
+        />
         </div>
 
         <!-- Password -->
         <div class="mt-4">
-        <label class="text-sm text-gray-300">Password</label>
-        <input 
-            type="password" 
+        <div class="flex justify-between items-baseline">
+            <label class="text-sm text-gray-300">Password</label>
+
+            @if (form.get('password')?.touched && form.get('password')?.errors?.['required']) {
+            <span class="text-red-500 text-sm flex items-center gap-1">
+                <i class="fa-solid fa-circle-info"></i>
+                Password is required
+            </span>
+            }
+        </div>
+
+        <input
+            type="password"
             formControlName="password"
             placeholder="**************"
-            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"/>
+            class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"
+        />
         </div>
 
         <!-- Forgot -->

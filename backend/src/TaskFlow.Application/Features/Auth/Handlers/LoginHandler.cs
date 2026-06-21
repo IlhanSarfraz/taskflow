@@ -69,7 +69,9 @@ namespace TaskFlow.Application.Features.Auth.Handlers
             return new LoginResponse(
                 token,
                 user.Id,
-                user.Email);
+                user.Email,
+                user.FirstName,
+                user.LastName);
         }
     }
 }
