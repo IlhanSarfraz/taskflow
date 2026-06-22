@@ -16,6 +16,7 @@ export class ProjectMemberService {
   }
 
   addMember(projectId: string, userId: string, role: number) {
+    debugger;
     return this.api.post(
       `projects/projectId=${projectId}/members`,
       {

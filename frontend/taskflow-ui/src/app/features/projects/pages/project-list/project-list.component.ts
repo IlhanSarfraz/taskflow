@@ -65,4 +65,12 @@ export class ProjectListComponent {
       'boards'
     ]);
   }
+
+  viewMembers(projectId: string): void {
+    this.router.navigate([
+      '/projects',
+      projectId,
+      'members'
+    ]);
+  }
 }

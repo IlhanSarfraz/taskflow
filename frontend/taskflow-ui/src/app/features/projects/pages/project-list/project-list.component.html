@@ -44,6 +44,13 @@
         </button>
 
         <button
+          (click)="viewMembers(project.id)"
+          class="w-10 h-10 flex items-center justify-center bg-[#262626] hover:bg-[#333] text-gray-300 rounded-lg"
+        >
+          <i class="fa-solid fa-users"></i>
+        </button>
+
+        <button
           (click)="goToEdit(project.id)"
           class="w-10 h-10 flex items-center justify-center bg-[#262626] hover:bg-[#333] text-gray-300 rounded-lg"
         >

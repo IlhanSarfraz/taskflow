@@ -1,22 +1,104 @@
-<h2>Project Members</h2>
+<div class="p-2">
+  <button
+    routerLink="/projects"
+    class="flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-6"
+  >
+    <i class="fa-solid fa-arrow-left"></i>
+    Back to projects
+  </button>
 
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Email</th>
-    <th>Role</th>
-    <th>Action</th>
-  </tr>
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h2 class="text-2xl font-semibold text-white">Team members</h2>
+      <p class="text-gray-400 mt-1">{{ members.length }} member{{ members.length === 1 ? '' : 's' }}</p>
+    </div>
 
-  <tr *ngFor="let m of members">
-    <td>{{ m.fullName }}</td>
-    <td>{{ m.email }}</td>
-    <td>{{ m.role }}</td>
+    <button
+      (click)="showAddForm = !showAddForm"
+      class="bg-[#08CB00] hover:bg-green-600 text-black font-semibold px-4 py-2.5 rounded-lg transition flex items-center gap-2"
+    >
+      <i class="fa-solid fa-user-plus"></i>
+      Add member
+    </button>
+  </div>
 
-    <td>
-      <button (click)="remove(m.userId)">
-        Remove
+  <!-- Add member form -->
+  <div *ngIf="showAddForm" class="bg-[#161616] border border-gray-700 rounded-xl p-5 mb-6 max-w-lg">
+    <p class="text-white font-medium mb-3">Add a member</p>
+    <div class="flex flex-col sm:flex-row gap-3">
+    <input
+      [(ngModel)]="newUserId"
+      placeholder="User ID (GUID)"
+      class="flex-1 p-2.5 rounded-lg bg-[#0d0d0d] text-white text-sm outline-none border border-gray-700 focus:border-green-500"
+    />
+      <select
+        [(ngModel)]="newRole"
+        class="p-2.5 rounded-lg bg-[#0d0d0d] text-white text-sm outline-none border border-gray-700 focus:border-green-500"
+      >
+        <option [value]="1">Admin</option>
+        <option [value]="2">Member</option>
+      </select>
+      <button
+        (click)="add()"
+        class="bg-[#08CB00] hover:bg-green-600 text-black font-semibold px-4 py-2.5 rounded-lg transition"
+      >
+        Add
       </button>
-    </td>
-  </tr>
-</table>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-gray-400 mt-6">
+    Loading members.....
+  </div>
+
+  <div *ngIf="!loading && members.length === 0" class="text-gray-400 mt-6">
+    No members found
+  </div>
+
+  <div
+    *ngIf="!loading && members.length > 0"
+    class="bg-[#161616] border border-gray-700 rounded-xl overflow-hidden"
+  >
+    <div class="grid grid-cols-[2fr_2fr_1fr_1fr] px-5 py-3 border-b border-gray-800 text-gray-400 text-sm">
+      <span>Name</span>
+      <span>Email</span>
+      <span>Role</span>
+      <span class="text-right">Actions</span>
+    </div>
+
+    <div
+      *ngFor="let m of members"
+      class="grid grid-cols-[2fr_2fr_1fr_1fr] items-center px-5 py-3 border-b border-gray-800 last:border-b-0"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-full bg-[#253900] text-[#08CB00] text-xs font-medium flex items-center justify-center">
+          {{ initials(m.fullName) }}
+        </div>
+        <span class="text-white text-sm">{{ m.fullName }}</span>
+      </div>
+
+      <span class="text-gray-400 text-sm">{{ m.email }}</span>
+
+      <span
+        class="text-xs font-medium px-2.5 py-1 rounded-md w-fit"
+        [ngClass]="{
+          'bg-[#152838] text-[#3b9eea]': m.role === 'Owner',
+          'bg-[#16240c] text-[#4ade80]': m.role === 'Admin',
+          'bg-[#1c1c1a] text-gray-400': m.role !== 'Owner' && m.role !== 'Admin'
+        }"
+      >
+        {{ m.role }}
+      </span>
+
+      <div class="flex justify-end">
+        <button
+          *ngIf="m.role !== 'Owner'"
+          (click)="remove(m.userId)"
+          class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-400 rounded-lg"
+        >
+          <i class="fa-solid fa-user-xmark"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
