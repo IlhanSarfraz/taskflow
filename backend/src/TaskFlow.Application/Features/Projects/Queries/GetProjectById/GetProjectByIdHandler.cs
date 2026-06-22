@@ -28,7 +28,10 @@ namespace TaskFlow.Application.Features.Projects.Queries.GetProjectById
                 .AsNoTracking()
                 .FirstOrDefaultAsync(
                 x => x.Id == request.Id &&
-                x.OwnerId == _currentUser.UserId,
+                (
+                    x.OwnerId == _currentUser.UserId ||
+                    x.Members.Any(m => m.UserId == _currentUser.UserId)
+                ),
                 cancellationToken) ??
                 throw new KeyNotFoundException(
                     $"Project '{request.Id}' not found");

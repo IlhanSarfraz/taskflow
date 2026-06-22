@@ -38,7 +38,10 @@ namespace TaskFlow.Application.Features.Boards.Commands.CreateBoard
 
             Project? project = await _context.Projects
                 .FirstOrDefaultAsync(x => x.Id == request.ProjectId &&
-                x.OwnerId == _currentUser.UserId,
+                (
+                    x.OwnerId == _currentUser.UserId ||
+                    x.Members.Any(m => m.UserId == _currentUser.UserId)
+                ),
                 cancellationToken) ??
                 throw new KeyNotFoundException("Project not found");
 

@@ -26,7 +26,9 @@ namespace TaskFlow.Application.Features.Projects.Queries.GetProjects
         {
             return await _context.Projects
                 .AsNoTracking()
-                .Where(x => x.OwnerId == _currentUser.UserId)
+                .Where(x =>
+                    x.OwnerId == _currentUser.UserId ||
+                    x.Members.Any(m => m.UserId == _currentUser.UserId))
                 .OrderBy(x => x.Name)
                 .Select(x => new ProjectResponse(
                     x.Id,

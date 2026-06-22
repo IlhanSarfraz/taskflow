@@ -27,7 +27,10 @@ public sealed class GetTaskByIdHandler
             .AsNoTracking()
             .Where(x =>
                 x.Id == request.TaskId &&
-                x.Project.OwnerId == _currentUser.UserId)
+                (
+                    x.Project.OwnerId == _currentUser.UserId ||
+                    x.Project.Members.Any(m => m.UserId == _currentUser.UserId)
+                ))
             .Select(x => new TaskDetailsResponse(
                 x.Id,
                 x.Title,

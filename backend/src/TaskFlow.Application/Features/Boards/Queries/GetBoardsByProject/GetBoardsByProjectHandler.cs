@@ -23,13 +23,16 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardsByProject
             GetBoardsByProjectQuery request,
             CancellationToken cancellationToken)
         {
-            bool isProjectOwner = await _context.Projects
-                .AnyAsync(
-                    x => x.Id == request.ProjectId &&
-                         x.OwnerId == _currentUser.UserId,
+            bool hasAccess = await _context.Projects
+                .AnyAsync(x =>
+                    x.Id == request.ProjectId &&
+                    (
+                        x.OwnerId == _currentUser.UserId ||
+                        x.Members.Any(m => m.UserId == _currentUser.UserId)
+                    ),
                     cancellationToken);
 
-            if (!isProjectOwner)
+            if (!hasAccess)
                 throw new KeyNotFoundException("Project not found.");
 
             return await _context.Boards

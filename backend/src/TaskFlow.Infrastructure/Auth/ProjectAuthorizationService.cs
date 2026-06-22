@@ -26,8 +26,17 @@ public sealed class ProjectAuthorizationService : IProjectAuthorizationService
                 cancellationToken);
 
         if (!isMember)
-            throw new UnauthorizedAccessException(
-                "You are not a project member.");
+        {
+            bool isOwner = await _context.Projects
+                .AnyAsync(x =>
+                    x.Id == projectId &&
+                    x.OwnerId == _currentUser.UserId,
+                    cancellationToken);
+
+            if (!isOwner)
+                throw new UnauthorizedAccessException(
+                    "You are not a project member.");
+        }
     }
 
     public async Task EnsureAdminAsync(Guid projectId, CancellationToken cancellationToken = default)
@@ -53,7 +62,16 @@ public sealed class ProjectAuthorizationService : IProjectAuthorizationService
                 cancellationToken);
 
         if (!isMember)
-            throw new UnauthorizedAccessException(
-                "You are not a project member");
+        {
+            bool isOwner = await _context.Projects
+                .AnyAsync(x =>
+                    x.Tasks.Any(t => t.Id == taskId) &&
+                    x.OwnerId == _currentUser.UserId,
+                    cancellationToken);
+
+            if (!isOwner)
+                throw new UnauthorizedAccessException(
+                    "You are not a project member");
+        }
     }
 }

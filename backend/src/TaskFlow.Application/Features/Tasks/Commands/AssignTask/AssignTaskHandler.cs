@@ -31,7 +31,10 @@ public sealed class AssignTaskHandler
             .Include(x => x.Assignments)
             .FirstOrDefaultAsync(
                 x => x.Id == request.TaskId &&
-                    x.Project.OwnerId == _currentUser.UserId,
+                    (
+                        x.Project.OwnerId == _currentUser.UserId ||
+                        x.Project.Members.Any(m => m.UserId == _currentUser.UserId)
+                    ),
                 cancellationToken)
             ?? throw new KeyNotFoundException("Task not found.");
 

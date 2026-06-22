@@ -24,11 +24,14 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateTask
             CreateTaskCommand request,
             CancellationToken cancellationToken)
         {
-            // Validate project ownership\
+            // Validate project ownership
             bool projectExists = await _context.Projects
                         .AnyAsync(
                             x => x.Id == request.ProjectId &&
-                                 x.OwnerId == _currentUser.UserId,
+                                 (
+                                     x.OwnerId == _currentUser.UserId ||
+                                     x.Members.Any(m => m.UserId == _currentUser.UserId)
+                                 ),
                             cancellationToken);
 
             if (!projectExists)

@@ -12,7 +12,9 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
 
-        public GetBoardByIdHandler(IApplicationDbContext context, ICurrentUserService currentUser)
+        public GetBoardByIdHandler(
+            IApplicationDbContext context,
+            ICurrentUserService currentUser)
         {
             _context = context;
             _currentUser = currentUser;
@@ -26,7 +28,11 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
                 .AsNoTracking()
                 .Where(x =>
                     x.Id == request.BoardId &&
-                    x.Project.OwnerId == _currentUser.UserId)
+                    (
+                        x.Project.OwnerId == _currentUser.UserId ||
+                        x.Project.Members.Any(m => m.UserId == _currentUser.UserId)
+                    )
+                )
                 .Select(b => new BoardDetailsResponse(
                     b.Id,
                     b.Name,
@@ -44,18 +50,15 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
                                     t.Title,
                                     t.Priority,
                                     t.DueDate,
+
+                                    // initials from assignments only (safe + EF-friendly)
                                     t.Assignments
                                         .OrderBy(a => a.User.FirstName)
                                         .Select(a =>
-                                            (a.User.FirstName.Substring(0, 1) + a.User.LastName.Substring(0, 1)).ToUpper())
+                                            (a.User.FirstName.Substring(0, 1) +
+                                             a.User.LastName.Substring(0, 1)).ToUpper()
+                                        )
                                         .FirstOrDefault()
-                                        ?? (t.AssigneeId == null
-                                            ? null
-                                            : _context.Users
-                                                .Where(u => u.Id == t.AssigneeId)
-                                                .Select(u =>
-                                                    (u.FirstName.Substring(0, 1) + u.LastName.Substring(0, 1)).ToUpper())
-                                                .FirstOrDefault())
                                 ))
                                 .ToList()
                         ))
