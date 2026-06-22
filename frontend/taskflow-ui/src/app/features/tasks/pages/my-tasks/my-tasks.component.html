@@ -1,16 +1,69 @@
-<h2>My Tasks</h2>
+<div class="p-2">
+  <h2 class="text-2xl font-semibold text-white">My Tasks</h2>
+  <p class="text-gray-400 mt-1">Tasks assigned to you across all projects</p>
 
-<div *ngIf="loading">
-  Loading...
+  <div *ngIf="loading" class="text-gray-400 mt-6">
+    Loading tasks.....
+  </div>
+
+  <div *ngIf="!loading && tasks.length === 0" class="text-gray-400 mt-6">
+    No tasks assigned to you
+  </div>
+
+  <div *ngIf="!loading && tasks.length > 0" class="flex flex-col gap-3 mt-6">
+    <div
+      *ngFor="let t of tasks"
+      class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-4 flex items-center justify-between gap-4"
+    >
+      <div class="flex items-center gap-4 min-w-0">
+        <span
+          class="text-xs font-medium px-2.5 py-1 rounded-md whitespace-nowrap"
+          [ngClass]="{
+            'bg-red-900 text-red-300': t.priority === 4,
+            'bg-red-950 text-red-400': t.priority === 3,
+            'bg-[#2a2110] text-amber-400': t.priority === 2,
+            'bg-[#16240c] text-green-400': t.priority === 1
+          }"
+        >
+          {{
+            t.priority === 4 ? 'Critical' :
+            t.priority === 3 ? 'High' :
+            t.priority === 2 ? 'Medium' : 'Low'
+          }}
+        </span>
+
+        <div class="min-w-0">
+          <p class="text-white font-medium truncate">
+            {{ t.title }}
+          </p>
+
+          <div class="flex items-center gap-3 mt-1 text-gray-500 text-xs flex-wrap">
+
+            <span *ngIf="t.projectName">
+              <i class="fa-solid fa-folder mr-1"></i>
+              {{ t.projectName }}
+            </span>
+
+            <span *ngIf="t.columnName">
+              <i class="fa-solid fa-list-check mr-1"></i>
+              {{ t.columnName }}
+            </span>
+
+            <span *ngIf="t.dueDate">
+              <i class="fa-solid fa-calendar mr-1"></i>
+              {{ t.dueDate | date:'MMM d, y' }}
+            </span>
+
+          </div>
+        </div>
+      </div>
+
+      <button
+        (click)="openTask(t.id)"
+        class="bg-[#262626] hover:bg-[#333] text-gray-300 font-medium text-sm px-4 py-2 rounded-lg transition flex-shrink-0"
+      >
+        Open
+      </button>
+    </div>
+  </div>
 </div>
-
-<ul *ngIf="!loading">
-  <li *ngFor="let t of tasks">
-    <b>{{ t.title }}</b>
-    - {{ t.priority }}
-
-    <button (click)="openTask(t.id)">
-      Open
-    </button>
-  </li>
-</ul>

@@ -36,6 +36,10 @@ export class CreateTaskComponent {
     this.columnId = this.route.snapshot.paramMap.get('columnId')!;
   }
   
+  goBack(): void {
+    this.router.navigate(['../'], { relativeTo: this.route });
+  }
+  
   submit(): void {
     if(this.form.invalid) return;
 
