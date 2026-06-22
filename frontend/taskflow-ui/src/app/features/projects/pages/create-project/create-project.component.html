@@ -1,57 +1,61 @@
-<div class="max-w-lg mx-auto p-2">
-  <button
+<div class="p-2">
+  <!-- <button
     routerLink="/projects"
     class="flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-6"
   >
     <i class="fa-solid fa-arrow-left"></i>
     Back to projects
-  </button>
+  </button> -->
 
   <h2 class="text-2xl font-semibold text-white">Create Project</h2>
   <p class="text-gray-400 mt-1">Set up a new project for your team</p>
 
-  <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 max-w-md">
 
-    <div>
-      <label class="text-sm text-gray-300">Project Name</label>
-      <input
-        placeholder="e.g. Mobile app revamp"
-        formControlName="name"
-        class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"
-      />
+    <div class="bg-[#161616] border border-gray-700 rounded-xl p-6 space-y-5">
+
+      <div>
+        <label class="text-sm text-gray-300">Project Name</label>
+        <input
+          placeholder="e.g. Mobile app revamp"
+          formControlName="name"
+          class="w-full mt-2 p-3 rounded-lg bg-[#0d0d0d] text-white text-base outline-none border border-gray-700 focus:border-green-500"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-300">Project Key</label>
+        <input
+          placeholder="e.g. MAR"
+          formControlName="key"
+          class="w-full mt-2 p-3 rounded-lg bg-[#0d0d0d] text-white text-base outline-none border border-gray-700 focus:border-green-500"
+        />
+      </div>
+
+      <div>
+        <label class="text-sm text-gray-300">Description</label>
+        <textarea
+          placeholder="What's this project about?"
+          formControlName="description"
+          rows="4"
+          class="w-full mt-2 p-3 rounded-lg bg-[#0d0d0d] text-white text-base outline-none border border-gray-700 focus:border-green-500 resize-none"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full bg-[#08CB00] hover:bg-green-600 text-black font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        @if (!loading) {
+          Create Project
+        }
+        @if (loading) {
+          Creating...
+        }
+      </button>
+
     </div>
-
-    <div>
-      <label class="text-sm text-gray-300">Project Key</label>
-      <input
-        placeholder="e.g. MAR"
-        formControlName="key"
-        class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500"
-      />
-    </div>
-
-    <div>
-      <label class="text-sm text-gray-300">Description</label>
-      <textarea
-        placeholder="What's this project about?"
-        formControlName="description"
-        rows="4"
-        class="w-full mt-2 p-3 rounded-lg bg-[#1e1e1e] text-white text-lg outline-none border-2 border-gray-700 focus:border-green-500 resize-none"
-      ></textarea>
-    </div>
-
-    <button
-      type="submit"
-      [disabled]="loading"
-      class="w-full mt-2 bg-[#08CB00] hover:bg-green-600 text-black font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      @if (!loading) {
-        Create Project
-      }
-      @if (loading) {
-        Creating...
-      }
-    </button>
 
   </form>
 </div>

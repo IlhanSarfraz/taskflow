@@ -23,6 +23,8 @@ export class RegisterComponent {
   private authService = inject(AuthService)
   private router = inject(Router)
   private notificationService = inject(NotificationService);
+  showPassword = false;
+  showConfirmPassword = false;
 
   form = this.fb.group({
     firstName: ['', [Validators.required]],

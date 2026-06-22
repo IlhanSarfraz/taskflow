@@ -17,6 +17,7 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private notificationService = inject(NotificationService);
+  showPassword = false;
 
   form = this.fb.group({
     email: [``, [Validators.required, Validators.email]],
