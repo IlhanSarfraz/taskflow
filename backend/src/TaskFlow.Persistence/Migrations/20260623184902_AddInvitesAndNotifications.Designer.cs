@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskFlow.Persistence.Context;
 
@@ -10,9 +11,11 @@ using TaskFlow.Persistence.Context;
 namespace TaskFlow.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260623184902_AddInvitesAndNotifications")]
+    partial class AddInvitesAndNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
@@ -73,86 +76,6 @@ namespace TaskFlow.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("BoardColumns");
-                });
-
-            modelBuilder.Entity("TaskFlow.Domain.Entities.Invite", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("InvitedByUserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("InvitedUserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("RespondedAtUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InvitedByUserId");
-
-                    b.HasIndex("InvitedUserId");
-
-                    b.HasIndex("ProjectId", "InvitedUserId", "Status");
-
-                    b.ToTable("Invites");
-                });
-
-            modelBuilder.Entity("TaskFlow.Domain.Entities.Notification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("RelatedEntityId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("UpdatedAtUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "IsRead");
-
-                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("TaskFlow.Domain.Entities.Project", b =>
@@ -418,44 +341,6 @@ namespace TaskFlow.Persistence.Migrations
                     b.Navigation("Board");
                 });
 
-            modelBuilder.Entity("TaskFlow.Domain.Entities.Invite", b =>
-                {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "InvitedBy")
-                        .WithMany("SentInvites")
-                        .HasForeignKey("InvitedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.User", "InvitedUser")
-                        .WithMany("ReceivedInvites")
-                        .HasForeignKey("InvitedUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TaskFlow.Domain.Entities.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("InvitedBy");
-
-                    b.Navigation("InvitedUser");
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("TaskFlow.Domain.Entities.Notification", b =>
-                {
-                    b.HasOne("TaskFlow.Domain.Entities.User", "User")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TaskFlow.Domain.Entities.Project", b =>
                 {
                     b.HasOne("TaskFlow.Domain.Entities.User", "Owner")
@@ -584,17 +469,11 @@ namespace TaskFlow.Persistence.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("Notifications");
-
                     b.Navigation("ProjectMemberships");
 
                     b.Navigation("Projects");
 
-                    b.Navigation("ReceivedInvites");
-
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("SentInvites");
                 });
 #pragma warning restore 612, 618
         }

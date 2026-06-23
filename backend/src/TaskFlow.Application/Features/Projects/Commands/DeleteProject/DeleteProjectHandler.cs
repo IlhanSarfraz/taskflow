@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Domain.Entities;
-using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Application.Features.Projects.Commands.DeleteProject
 {
@@ -24,23 +23,25 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeleteProject
             DeleteProjectCommand request,
             CancellationToken cancellationToken)
         {
+            Project project = await _context.Projects
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
+                ?? throw new KeyNotFoundException(
+                    $"Project '{request.Id}' not found.");
+
+            bool isOwner = project.OwnerId == _currentUser.UserId;
 
             bool isAdmin = await _context.ProjectMembers
                 .AnyAsync(x =>
                     x.ProjectId == request.Id &&
                     x.UserId == _currentUser.UserId &&
-                    x.Role == ProjectMemberRole.Admin,
+                    x.Role == Domain.Enums.ProjectMemberRole.Admin,
                     cancellationToken);
 
-            if (!isAdmin)
-                throw new UnauthorizedAccessException("You are not allowed to add members.");
-
-            Project? project = await _context.Projects
-                .FirstOrDefaultAsync(x => x.Id == request.Id &&
-                x.OwnerId == _currentUser.UserId,
-                cancellationToken) ??
-                throw new KeyNotFoundException(
-                    $"Project '{request.Id}' not found.");
+            if (!isOwner && !isAdmin)
+            {
+                throw new UnauthorizedAccessException(
+                    "You are not allowed to delete this project.");
+            }
 
             _context.Projects.Remove(project);
 

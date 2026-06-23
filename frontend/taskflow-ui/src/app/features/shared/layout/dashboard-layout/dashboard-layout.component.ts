@@ -7,6 +7,7 @@ import {
 } from '@angular/router';
 import { AuthService } from '../../../auth/services/auth.service';
 import { Location } from '@angular/common';
+import { NotificationBellComponent } from '../../components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -14,7 +15,8 @@ import { Location } from '@angular/common';
   imports: [
     RouterOutlet,
     RouterLink,
-    RouterLinkActive
+    RouterLinkActive,
+    NotificationBellComponent
   ],
   templateUrl: './dashboard-layout.component.html',
   styleUrl: './dashboard-layout.component.scss',

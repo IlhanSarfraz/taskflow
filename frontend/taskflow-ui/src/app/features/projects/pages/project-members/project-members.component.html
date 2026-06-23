@@ -14,23 +14,42 @@
     </div>
 
     <button
+      *ngIf="canManageMembers"
       (click)="showAddForm = !showAddForm"
       class="bg-[#08CB00] hover:bg-green-600 text-black font-semibold px-4 py-2.5 rounded-lg transition flex items-center gap-2"
     >
       <i class="fa-solid fa-user-plus"></i>
-      Add member
+      Invite member
     </button>
   </div>
 
-  <!-- Add member form -->
-  <div *ngIf="showAddForm" class="bg-[#161616] border border-gray-700 rounded-xl p-5 mb-6 max-w-lg">
-    <p class="text-white font-medium mb-3">Add a member</p>
-    <div class="flex flex-col sm:flex-row gap-3">
-    <input
-      [(ngModel)]="newUserId"
-      placeholder="User ID (GUID)"
-      class="flex-1 p-2.5 rounded-lg bg-[#0d0d0d] text-white text-sm outline-none border border-gray-700 focus:border-green-500"
-    />
+  <!-- Invite member form -->
+  <div *ngIf="showAddForm && canManageMembers" class="bg-[#161616] border border-gray-700 rounded-xl p-5 mb-6 max-w-lg">
+    <p class="text-white font-medium mb-3">Invite a member</p>
+    <div class="flex flex-col sm:flex-row gap-3 relative">
+      <div class="flex-1 relative">
+        <input
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Search by name or email"
+          class="w-full p-2.5 rounded-lg bg-[#0d0d0d] text-white text-sm outline-none border border-gray-700 focus:border-green-500"
+        />
+
+        <div
+          *ngIf="searchResults.length > 0"
+          class="absolute top-full left-0 right-0 mt-1 bg-[#0d0d0d] border border-gray-700 rounded-lg z-10 max-h-48 overflow-y-auto"
+        >
+          <div
+            *ngFor="let u of searchResults"
+            (click)="selectUser(u)"
+            class="px-3 py-2 text-sm text-gray-200 hover:bg-[#1e1e1e] cursor-pointer"
+          >
+            <span class="text-white">{{ u.fullName }}</span>
+            <span class="text-gray-500 text-xs ml-1">{{ u.email }}</span>
+          </div>
+        </div>
+      </div>
+
       <select
         [(ngModel)]="newRole"
         class="p-2.5 rounded-lg bg-[#0d0d0d] text-white text-sm outline-none border border-gray-700 focus:border-green-500"
@@ -38,11 +57,13 @@
         <option [value]="1">Admin</option>
         <option [value]="2">Member</option>
       </select>
+
       <button
-        (click)="add()"
-        class="bg-[#08CB00] hover:bg-green-600 text-black font-semibold px-4 py-2.5 rounded-lg transition"
+        (click)="invite()"
+        [disabled]="inviting"
+        class="bg-[#08CB00] hover:bg-green-600 text-black font-semibold px-4 py-2.5 rounded-lg transition disabled:opacity-50"
       >
-        Add
+        {{ inviting ? 'Sending...' : 'Invite' }}
       </button>
     </div>
   </div>
@@ -92,7 +113,7 @@
 
       <div class="flex justify-end">
         <button
-          *ngIf="m.role !== 'Owner'"
+          *ngIf="m.role !== 'Owner' && canManageMembers"
           (click)="remove(m.userId)"
           class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-400 rounded-lg"
         >

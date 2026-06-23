@@ -15,18 +15,6 @@ export class ProjectMemberService {
     );
   }
 
-  addMember(projectId: string, userId: string, role: number) {
-    debugger;
-    return this.api.post(
-      `projects/projectId=${projectId}/members`,
-      {
-        projectId,
-        userId,
-        role
-      }
-    );
-  }
-
   removeMember(projectId: string, userId: string) {
     return this.api.delete(
       `projects/projectId=${projectId}/members/userId=${userId}`

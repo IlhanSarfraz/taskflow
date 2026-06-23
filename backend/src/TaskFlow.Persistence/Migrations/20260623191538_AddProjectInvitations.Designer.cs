@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskFlow.Persistence.Context;
 
@@ -10,9 +11,11 @@ using TaskFlow.Persistence.Context;
 namespace TaskFlow.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260623191538_AddProjectInvitations")]
+    partial class AddProjectInvitations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
@@ -84,6 +87,9 @@ namespace TaskFlow.Persistence.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("InvitedById")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("InvitedByUserId")
                         .HasColumnType("TEXT");
 
@@ -107,11 +113,11 @@ namespace TaskFlow.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvitedByUserId");
+                    b.HasIndex("InvitedById");
 
                     b.HasIndex("InvitedUserId");
 
-                    b.HasIndex("ProjectId", "InvitedUserId", "Status");
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("Invites");
                 });
@@ -150,7 +156,7 @@ namespace TaskFlow.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "IsRead");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
                 });
@@ -421,13 +427,13 @@ namespace TaskFlow.Persistence.Migrations
             modelBuilder.Entity("TaskFlow.Domain.Entities.Invite", b =>
                 {
                     b.HasOne("TaskFlow.Domain.Entities.User", "InvitedBy")
-                        .WithMany("SentInvites")
-                        .HasForeignKey("InvitedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany()
+                        .HasForeignKey("InvitedById")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TaskFlow.Domain.Entities.User", "InvitedUser")
-                        .WithMany("ReceivedInvites")
+                        .WithMany()
                         .HasForeignKey("InvitedUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -448,7 +454,7 @@ namespace TaskFlow.Persistence.Migrations
             modelBuilder.Entity("TaskFlow.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("TaskFlow.Domain.Entities.User", "User")
-                        .WithMany("Notifications")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -584,17 +590,11 @@ namespace TaskFlow.Persistence.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("Notifications");
-
                     b.Navigation("ProjectMemberships");
 
                     b.Navigation("Projects");
 
-                    b.Navigation("ReceivedInvites");
-
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("SentInvites");
                 });
 #pragma warning restore 612, 618
         }

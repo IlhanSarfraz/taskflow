@@ -28,5 +28,14 @@ namespace TaskFlow.Domain.Entities
 
         public ICollection<TaskComment> Comments { get; set; }
             = new List<TaskComment>();
+
+        public ICollection<Invite> SentInvites { get; set; }
+            = new List<Invite>();
+
+        public ICollection<Invite> ReceivedInvites { get; set; }
+            = new List<Invite>();
+
+        public ICollection<Notification> Notifications { get; set; }
+            = new List<Notification>();
     }
 }

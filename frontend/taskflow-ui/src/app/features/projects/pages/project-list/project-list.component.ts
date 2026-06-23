@@ -43,17 +43,21 @@ export class ProjectListComponent {
   }
 
   deleteProject(id: string): void {
-    
     const confirmDelete = confirm('Are you sure you want to delete this project?');
     if (!confirmDelete) return;
-    
-    this.projectService.deleteProject(id)
-    .subscribe({
+
+    this.projectService.deleteProject(id).subscribe({
       next: () => {
         this.projects = this.projects.filter(p => p.id !== id);
+
+        this.cdr.markForCheck();
+
+        if (this.projects.length === 0) {
+          this.loading = false;
+        }
       },
       error: (err) => {
-        console.error(`Delete Failed`, err)
+        console.error(`Delete Failed`, err);
       }
     });
   }

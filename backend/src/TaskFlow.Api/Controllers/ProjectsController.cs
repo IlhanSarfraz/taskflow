@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Auth.Commands.CreateProject;
-using TaskFlow.Application.Features.Projects.Commands.AddProjectMember;
+using TaskFlow.Application.Features.Projects.Commands.CreateInvite;
 using TaskFlow.Application.Features.Projects.Commands.DeleteProject;
 using TaskFlow.Application.Features.Projects.Commands.RemoveProjectMember;
 using TaskFlow.Application.Features.Projects.Commands.UpdateProject;
@@ -63,19 +63,6 @@ namespace TaskFlow.Api.Controllers
             return NoContent();
         }
 
-        [HttpPost("projectId={projectId:guid}/members")]
-        public async Task<IActionResult> AddMember(
-            Guid projectId,
-            AddProjectMemberCommand command)
-        {
-            if (projectId != command.ProjectId)
-                return BadRequest("ProjectId mismatch");
-
-            await _mediator.Send(command);
-
-            return Ok();
-        }
-
         [HttpGet("projectId={projectId:guid}/members")]
         public async Task<IActionResult> GetMembers(Guid projectId)
         {
@@ -92,6 +79,19 @@ namespace TaskFlow.Api.Controllers
                 new RemoveProjectMemberCommand(projectId, userId));
 
             return NoContent();
+        }
+
+        [HttpPost("projectId={projectId:guid}/invites")]
+        public async Task<IActionResult> Invite(
+            Guid projectId,
+            CreateInviteCommand command)
+        {
+            if (projectId != command.ProjectId)
+                return BadRequest("ProjectId mismatch");
+
+            await _mediator.Send(command);
+
+            return Ok();
         }
     }
 }

@@ -45,6 +45,11 @@ export class AuthService{
                     'lastName',
                     response.lastName
                 );
+
+                localStorage.setItem(
+                    'userId',
+                    response.userId
+                );
             })
         );
     }

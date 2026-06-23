@@ -16,7 +16,10 @@ namespace TaskFlow.Persistence
 
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlite(connectionString);
+                options.UseSqlite(connectionString, sqliteOptions =>
+                {
+                    sqliteOptions.CommandTimeout(30);
+                });
             });
 
             services.AddScoped<IApplicationDbContext>(

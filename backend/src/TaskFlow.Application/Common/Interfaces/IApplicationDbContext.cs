@@ -14,7 +14,8 @@ namespace TaskFlow.Application.Common.Interfaces
         DbSet<ProjectMember> ProjectMembers { get; }
         DbSet<TaskComment> TaskComments { get; }
         DbSet<TaskAssignment> TaskAssignments { get; }
-
+        DbSet<Invite> Invites { get; }
+        DbSet<Notification> Notifications { get; }
         Task<int> SaveChangesAsync(
             CancellationToken cancellationToken = default);
     }
