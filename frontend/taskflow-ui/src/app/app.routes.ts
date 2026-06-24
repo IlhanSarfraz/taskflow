@@ -88,6 +88,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/tasks/pages/task-details/task-details.component')
             .then(m => m.TaskDetailsComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/pages/profile/profile.component')
+            .then(m => m.ProfileComponent)
       }
     ]
   }
