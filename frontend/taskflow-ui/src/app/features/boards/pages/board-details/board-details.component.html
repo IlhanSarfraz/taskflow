@@ -85,7 +85,8 @@
               </span>
             </div>
 
-            <div class="relative shrink-0 ml-2">
+            <!-- Only show menu for non-default columns -->
+            <div *ngIf="!isDefaultColumn(column.name)" class="relative shrink-0 ml-2">
               <button
                 (click)="toggleColumnMenu(column.id, $event)"
                 class="w-7 h-7 flex items-center justify-center rounded-md text-gray-500 hover:text-white hover:bg-[#252525] transition"

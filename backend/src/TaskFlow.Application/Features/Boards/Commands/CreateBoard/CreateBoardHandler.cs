@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using TaskFlow.Application.Common.Constants;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Application.Features.Boards.DTOs;
 using TaskFlow.Domain.Entities;
@@ -60,12 +61,12 @@ namespace TaskFlow.Application.Features.Boards.Commands.CreateBoard
 
             _context.Boards.Add(board);
 
-            List<BoardColumn> columns = new()
-            {
-                new BoardColumn { Name = "To Do", Order = 0, Board = board },
-                new BoardColumn { Name = "In Progress", Order = 1, Board = board },
-                new BoardColumn { Name = "Done", Order = 2, Board = board }
-            };
+            List<BoardColumn> columns =
+            [
+                new BoardColumn { Name = BoardColumnNames.ToDo,        Order = 0, Board = board },
+                new BoardColumn { Name = BoardColumnNames.InProgress,  Order = 1, Board = board },
+                new BoardColumn { Name = BoardColumnNames.Done,        Order = 2, Board = board }
+            ];
 
             _context.BoardColumns.AddRange(columns);
 

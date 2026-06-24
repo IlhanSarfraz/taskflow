@@ -30,7 +30,7 @@ namespace TaskFlow.Application.Features.Boards.Commands.RenameColumn
                     cancellationToken)
                 ?? throw new KeyNotFoundException();
 
-            await _auth.EnsureAdminAsync(column.Board.ProjectId, cancellationToken);
+            await _auth.EnsureProjectManagerAsync(column.Board.ProjectId, cancellationToken);
 
             column.Name = request.Name;
 
