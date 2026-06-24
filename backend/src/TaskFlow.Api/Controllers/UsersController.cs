@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Application.Features.Users.Commands.UpdateProfile;
 using TaskFlow.Application.Features.Users.Queries.GetUserActivity;
 using TaskFlow.Application.Features.Users.Queries.GetUserProfile;
 using TaskFlow.Application.Features.Users.Queries.SearchUsers;
@@ -35,6 +36,13 @@ namespace TaskFlow.Api.Controllers
         public async Task<IActionResult> GetProfile()
         {
             return Ok(await _mediator.Send(new GetUserProfileQuery()));
+        }
+
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command)
+        {
+            await _mediator.Send(command);
+            return NoContent();
         }
     }
 }

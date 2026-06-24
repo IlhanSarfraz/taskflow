@@ -31,7 +31,7 @@ export class ProfileService {
 
     updateProfile(request: UpdateProfileRequest): Observable<void> {
     return this.api.put<void>(
-        'users/profile',
+        'users/update-profile',
         request
     );
     }

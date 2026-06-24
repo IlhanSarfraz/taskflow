@@ -114,6 +114,7 @@ export class ProfileComponent implements OnInit {
     this.savingProfile = true;
     this.saveProfileSuccess = false;
     this.saveProfileError = '';
+    this.cdr.markForCheck();
 
     const request: UpdateProfileRequest = {
       firstName: this.firstName,
@@ -122,19 +123,31 @@ export class ProfileComponent implements OnInit {
     };
 
     this.profileService.updateProfile(request).subscribe({
-        next: () => {
+      next: () => {
         this.savingProfile = false;
         this.saveProfileSuccess = true;
+
         if (this.profile) {
           this.profile.firstName = this.firstName;
           this.profile.lastName = this.lastName;
           this.profile.email = this.email;
         }
-        setTimeout(() => this.saveProfileSuccess = false, 3000);
+
+        this.loadActivity();
+
+        this.cdr.markForCheck();
+
+        setTimeout(() => {
+          this.saveProfileSuccess = false;
+          this.cdr.markForCheck();
+        }, 3000);
       },
       error: (err) => {
         this.savingProfile = false;
-        this.saveProfileError = err?.error?.message ?? 'Failed to save changes.';
+        this.saveProfileError =
+          err?.error?.message ?? 'Failed to save changes.';
+
+        this.cdr.markForCheck();
       }
     });
   }
@@ -161,10 +174,19 @@ export class ProfileComponent implements OnInit {
       next: () => {
         this.savingPassword = false;
         this.savePasswordSuccess = true;
+
         this.currentPassword = '';
         this.newPassword = '';
         this.confirmNewPassword = '';
-        setTimeout(() => this.savePasswordSuccess = false, 3000);
+
+        this.loadActivity();
+
+        this.cdr.markForCheck();
+
+        setTimeout(() => {
+          this.savePasswordSuccess = false;
+          this.cdr.markForCheck();
+        }, 3000);
       },
       error: (err) => {
         this.savingPassword = false;
