@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Features\Auth\Validators\**" />
+    <EmbeddedResource Remove="Features\Auth\Validators\**" />
+    <None Remove="Features\Auth\Validators\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TaskFlow.Domain\TaskFlow.Domain.csproj" />
   </ItemGroup>
 
@@ -9,10 +15,6 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Auth\Validators\" />
   </ItemGroup>
 
   <PropertyGroup>

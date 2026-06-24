@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Application.Features.Auth.Commands.ChangePassword;
 using TaskFlow.Application.Features.Auth.Commands.Login;
 using TaskFlow.Application.Features.Auth.Commands.RefreshToken;
 using TaskFlow.Application.Features.Auth.Commands.Register;
@@ -28,6 +29,14 @@ public sealed class AuthController : ControllerBase
     public async Task<IActionResult> Login(LoginCommand command)
     {
         return Ok(await _mediator.Send(command));
+    }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordCommand command)
+    {
+        await _mediator.Send(command);
+
+        return Ok();
     }
 
     [HttpPost("refresh-token")]
