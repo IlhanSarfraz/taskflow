@@ -21,7 +21,7 @@
           {{ alert.title }}
         </h3>
 
-        <ul *ngIf="alert.messages?.length" class="list-disc ml-5 mt-2 text-sm">
+        <ul *ngIf="alert.messages.length" class="list-disc ml-5 mt-2 text-sm">
           <li *ngFor="let message of alert.messages">{{ message }}</li>
         </ul>
       </div>
