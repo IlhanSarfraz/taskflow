@@ -11,13 +11,16 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeclineInvite
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public DeclineInviteHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -69,6 +72,10 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeclineInvite
                 RelatedEntityId = invite.Id,
                 IsRead = false
             });
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "InviteDeclined", "Project",
+                invite.ProjectId, $"Declined invite to \"{project?.Name}\"", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

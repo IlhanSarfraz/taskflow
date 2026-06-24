@@ -10,10 +10,14 @@ import { ApiService } from '../../../core/services/api.service';
 export class InvitationService {
   private api = inject(ApiService);
 
-  createInvite(projectId: string, invitedUserId: string, role: number): Observable<void> {
+  createInvite(projectId: string, invitedEmail: string, role: number): Observable<void> {
     return this.api.post<void>(
       `projects/projectId=${projectId}/invites`,
-      { projectId, invitedUserId, role }
+      {
+        projectId,
+        invitedEmail,
+        role
+      }
     );
   }
 

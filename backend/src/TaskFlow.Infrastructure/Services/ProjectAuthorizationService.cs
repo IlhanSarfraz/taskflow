@@ -2,7 +2,7 @@
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Domain.Enums;
 
-namespace TaskFlow.Infrastructure.Auth;
+namespace TaskFlow.Infrastructure.Services;
 
 public sealed class ProjectAuthorizationService : IProjectAuthorizationService
 {
@@ -51,6 +51,30 @@ public sealed class ProjectAuthorizationService : IProjectAuthorizationService
         if (!isAdmin)
             throw new UnauthorizedAccessException(
                 "Admin access required.");
+    }
+
+    public async Task EnsureProjectManagerAsync(
+        Guid projectId,
+        CancellationToken cancellationToken = default)
+    {
+        bool isAdmin = await _context.ProjectMembers
+            .AnyAsync(x =>
+                x.ProjectId == projectId &&
+                x.UserId == _currentUser.UserId &&
+                x.Role == ProjectMemberRole.Admin,
+                cancellationToken);
+
+        bool isOwner = await _context.Projects
+            .AnyAsync(x =>
+                x.Id == projectId &&
+                x.OwnerId == _currentUser.UserId,
+                cancellationToken);
+
+        if (!isAdmin && !isOwner)
+        {
+            throw new UnauthorizedAccessException(
+                "Admin or owner access required.");
+        }
     }
 
     public async Task EnsureTaskMemberAsync(Guid taskId, CancellationToken cancellationToken)

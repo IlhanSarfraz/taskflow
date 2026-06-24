@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Common.Interfaces;
-using TaskFlow.Application.Features.Projects.DTOs;
-using TaskFlow.Application.Features.Tasks.Dtos;
 
 using TaskFlow.Domain.Entities;
 
@@ -13,13 +11,16 @@ public sealed class AssignTaskHandler
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
+    private readonly IActivityLogger _activityLogger;
 
     public AssignTaskHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        IActivityLogger activityLogger)
     {
         _context = context;
         _currentUser = currentUser;
+        _activityLogger = activityLogger;
     }
 
     public async Task Handle(
@@ -72,6 +73,10 @@ public sealed class AssignTaskHandler
         }
 
         task.AssigneeId = assigneeIds.FirstOrDefault();
+
+        await _activityLogger.LogAsync(
+            _currentUser.UserId, "TaskAssigned", "Task",
+            task.Id, $"Updated assignments for task \"{task.Title}\"", cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
     }

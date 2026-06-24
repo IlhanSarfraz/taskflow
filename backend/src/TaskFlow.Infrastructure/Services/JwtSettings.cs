@@ -1,4 +1,4 @@
-﻿namespace TaskFlow.Infrastructure.Auth;
+﻿namespace TaskFlow.Infrastructure.Services;
 
 public class JwtSettings
 {

@@ -11,13 +11,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteComment
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public DeleteCommentHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -44,6 +47,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteComment
 
             if (!canDelete)
                 throw new UnauthorizedAccessException();
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "CommentDeleted", "Task",
+                comment.TaskId, "Deleted a comment", cancellationToken);
 
             _context.TaskComments.Remove(comment);
 

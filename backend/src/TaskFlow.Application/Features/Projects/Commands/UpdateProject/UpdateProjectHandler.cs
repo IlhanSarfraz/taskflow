@@ -11,13 +11,16 @@ namespace TaskFlow.Application.Features.Projects.Commands.UpdateProject
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public UpdateProjectHandler(
             ICurrentUserService currentUser,
-            IApplicationDbContext context)
+            IApplicationDbContext context,
+            IActivityLogger activityLogger)
         {
             _currentUser = currentUser;
             _context = context;
+            _activityLogger = activityLogger;
         }
 
         public async Task<ProjectResponse> Handle(
@@ -31,8 +34,18 @@ namespace TaskFlow.Application.Features.Projects.Commands.UpdateProject
                 throw new KeyNotFoundException(
                     $"Project '{request.Id}' not found");
 
+            if (project.OwnerId != _currentUser.UserId)
+            {
+                throw new UnauthorizedAccessException(
+                    "You are not authorized to update this project.");
+            }
+
             project.Name = request.Name;
             project.Description = request.Description;
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "ProjectUpdated", "Project",
+                project.Id, $"Updated project \"{project.Name}\"", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

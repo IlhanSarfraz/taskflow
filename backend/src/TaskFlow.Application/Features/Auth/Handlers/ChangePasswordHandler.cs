@@ -12,15 +12,18 @@ namespace TaskFlow.Application.Features.Auth.Handlers
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IActivityLogger _activityLogger;
 
         public ChangePasswordHandler(
             IApplicationDbContext context,
             ICurrentUserService currentUser,
-            IPasswordHasher passwordHasher)
+            IPasswordHasher passwordHasher,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
             _passwordHasher = passwordHasher;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -44,6 +47,10 @@ namespace TaskFlow.Application.Features.Auth.Handlers
 
             user.PasswordHash =
                 _passwordHasher.Hash(request.NewPassword);
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "PasswordChanged", "User",
+                user.Id, "Changed account password", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

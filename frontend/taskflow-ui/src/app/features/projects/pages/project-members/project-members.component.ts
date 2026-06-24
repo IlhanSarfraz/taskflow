@@ -100,8 +100,12 @@ export class ProjectMembersComponent {
     }
 
     this.inviting = true;
-    this.invitationService.createInvite(this.projectId, this.selectedUser.id, this.newRole)
-      .pipe(finalize(() => {
+    this.invitationService.createInvite(
+      this.projectId,
+      this.selectedUser.email,
+      this.newRole
+    )      
+    .pipe(finalize(() => {
         this.inviting = false;
         this.cdr.markForCheck();
       }))

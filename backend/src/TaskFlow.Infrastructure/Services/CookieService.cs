@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using TaskFlow.Application.Common.Interfaces;
 
-namespace TaskFlow.Infrastructure.Auth
+namespace TaskFlow.Infrastructure.Services
 {
     public class CookieService : ICookieService
     {

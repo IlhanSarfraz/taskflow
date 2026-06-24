@@ -26,7 +26,7 @@ namespace TaskFlow.Application.Features.Boards.Commands.DeleteColumn
                 .FirstOrDefaultAsync(x => x.Id == request.ColumnId, cancellationToken)
                 ?? throw new KeyNotFoundException("Column not found");
 
-            await _auth.EnsureMemberAsync(column.Board.ProjectId, cancellationToken);
+            await _auth.EnsureAdminAsync(column.Board.ProjectId, cancellationToken);
 
             _context.BoardColumns.Remove(column);
 

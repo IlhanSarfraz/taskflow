@@ -27,7 +27,7 @@ namespace TaskFlow.Application.Features.Boards.Commands.ReorderColumns
                 .FirstOrDefaultAsync(x => x.Id == request.BoardId, cancellationToken)
                 ?? throw new KeyNotFoundException("Board not found");
 
-            await _auth.EnsureMemberAsync(board.ProjectId, cancellationToken);
+            await _auth.EnsureAdminAsync(board.ProjectId, cancellationToken);
 
             List<BoardColumn> columns = await _context.BoardColumns
                 .Where(x => x.BoardId == request.BoardId)

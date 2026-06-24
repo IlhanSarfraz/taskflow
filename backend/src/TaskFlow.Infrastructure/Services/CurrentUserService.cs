@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using TaskFlow.Application.Common.Interfaces;
 
-namespace TaskFlow.Infrastructure.Auth
+namespace TaskFlow.Infrastructure.Services
 {
     public sealed class CurrentUserService : ICurrentUserService
     {

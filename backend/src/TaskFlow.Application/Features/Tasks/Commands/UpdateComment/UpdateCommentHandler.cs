@@ -10,13 +10,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateComment
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public UpdateCommentHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -34,6 +37,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateComment
                     "You can only edit your own comments.");
 
             comment.Content = request.Content;
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "CommentUpdated", "Task",
+                comment.TaskId, "Edited a comment", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

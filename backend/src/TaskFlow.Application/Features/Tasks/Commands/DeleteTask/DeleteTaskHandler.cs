@@ -10,13 +10,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteTask
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public DeleteTaskHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -33,6 +36,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteTask
                        ),
                     cancellationToken)
                 ?? throw new KeyNotFoundException("Task not found.");
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "TaskDeleted", "Task",
+                task.Id, $"Deleted task \"{task.Title}\"", cancellationToken);
 
             _context.Tasks.Remove(task);
 

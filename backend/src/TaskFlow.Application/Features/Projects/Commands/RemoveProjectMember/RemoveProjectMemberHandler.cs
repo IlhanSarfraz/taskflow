@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Domain.Entities;
-using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Application.Features.Projects.Commands.RemoveProjectMember
 {
@@ -11,28 +10,27 @@ namespace TaskFlow.Application.Features.Projects.Commands.RemoveProjectMember
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
+        private readonly IProjectAuthorizationService _auth;
 
         public RemoveProjectMemberHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger,
+            IProjectAuthorizationService auth)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
+            _auth = auth;
         }
 
         public async Task Handle(
             RemoveProjectMemberCommand request,
             CancellationToken cancellationToken)
         {
-            bool isAdmin = await _context.ProjectMembers
-                .AnyAsync(x =>
-                    x.ProjectId == request.ProjectId &&
-                    x.UserId == _currentUser.UserId &&
-                    x.Role == ProjectMemberRole.Admin,
-                    cancellationToken);
-
-            if (!isAdmin)
-                throw new UnauthorizedAccessException("You are not allowed to remove members.");
+            await _auth
+                .EnsureProjectManagerAsync(request.ProjectId, cancellationToken);
 
             ProjectMember? member = await _context.ProjectMembers
                 .FirstOrDefaultAsync(x =>
@@ -44,6 +42,10 @@ namespace TaskFlow.Application.Features.Projects.Commands.RemoveProjectMember
                 return;
 
             _context.ProjectMembers.Remove(member);
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "MemberRemoved", "Project",
+                request.ProjectId, $"Removed user {request.UserId} from project", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

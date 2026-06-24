@@ -11,19 +11,31 @@ namespace TaskFlow.Application.Features.Projects.Commands.CreateInvite
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public CreateInviteHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
             CreateInviteCommand request,
             CancellationToken cancellationToken)
         {
+            Project? project = await _context.Projects
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    p => p.Id == request.ProjectId,
+                    cancellationToken);
+
+            if (project is null)
+                throw new KeyNotFoundException("Project not found.");
+
             bool isAdmin = await _context.ProjectMembers
                 .AnyAsync(x =>
                     x.ProjectId == request.ProjectId &&
@@ -31,41 +43,55 @@ namespace TaskFlow.Application.Features.Projects.Commands.CreateInvite
                     x.Role == ProjectMemberRole.Admin,
                     cancellationToken);
 
-            Project? project = await _context.Projects
-                .AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Id == request.ProjectId, cancellationToken);
-
-            if (project is null)
-                throw new InvalidOperationException("Project not found");
-
             bool isOwner = project.OwnerId == _currentUser.UserId;
 
             if (!isAdmin && !isOwner)
-                throw new UnauthorizedAccessException("You are not allowed to invite members.");
+            {
+                throw new UnauthorizedAccessException(
+                    "You are not allowed to invite members.");
+            }
+
+            User? invitedUser = await _context.Users
+                .FirstOrDefaultAsync(
+                    x => x.Email == request.InvitedEmail,
+                    cancellationToken);
+
+            if (invitedUser is null)
+            {
+                throw new KeyNotFoundException(
+                    $"No user found with email '{request.InvitedEmail}'.");
+            }
 
             bool alreadyMember = await _context.ProjectMembers
                 .AnyAsync(x =>
                     x.ProjectId == request.ProjectId &&
-                    x.UserId == request.InvitedUserId,
-                    cancellationToken) || project.OwnerId == request.InvitedUserId;
+                    x.UserId == invitedUser.Id,
+                    cancellationToken)
+                || project.OwnerId == invitedUser.Id;
 
             if (alreadyMember)
-                throw new InvalidOperationException("User is already a member of this project.");
+            {
+                throw new InvalidOperationException(
+                    "User is already a member of this project.");
+            }
 
             bool alreadyInvited = await _context.Invites
                 .AnyAsync(x =>
                     x.ProjectId == request.ProjectId &&
-                    x.InvitedUserId == request.InvitedUserId &&
+                    x.InvitedUserId == invitedUser.Id &&
                     x.Status == InviteStatus.Pending,
                     cancellationToken);
 
             if (alreadyInvited)
-                throw new InvalidOperationException("User already has a pending invite.");
+            {
+                throw new InvalidOperationException(
+                    "User already has a pending invite.");
+            }
 
             Invite invite = new()
             {
                 ProjectId = request.ProjectId,
-                InvitedUserId = request.InvitedUserId,
+                InvitedUserId = invitedUser.Id,
                 InvitedByUserId = _currentUser.UserId,
                 Role = request.Role,
                 Status = InviteStatus.Pending
@@ -75,7 +101,7 @@ namespace TaskFlow.Application.Features.Projects.Commands.CreateInvite
 
             Notification notification = new()
             {
-                UserId = request.InvitedUserId,
+                UserId = invitedUser.Id,
                 Type = NotificationType.ProjectInvite,
                 Title = "Project invitation",
                 Message = $"You've been invited to join \"{project.Name}\".",
@@ -84,6 +110,14 @@ namespace TaskFlow.Application.Features.Projects.Commands.CreateInvite
             };
 
             _context.Notifications.Add(notification);
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId,
+                "InviteSent",
+                "Project",
+                request.ProjectId,
+                $"Invited {invitedUser.Email} to \"{project.Name}\"",
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

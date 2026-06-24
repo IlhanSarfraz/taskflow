@@ -6,7 +6,7 @@ using System.Text;
 using TaskFlow.Application.Common.Interfaces;
 using TaskFlow.Domain.Entities;
 
-namespace TaskFlow.Infrastructure.Auth
+namespace TaskFlow.Infrastructure.Services
 {
     public class JwtTokenService : IJwtTokenService
     {

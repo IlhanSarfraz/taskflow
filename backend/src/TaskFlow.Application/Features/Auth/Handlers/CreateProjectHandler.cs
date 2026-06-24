@@ -13,13 +13,16 @@ namespace TaskFlow.Application.Features.Auth.Handlers
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IActivityLogger _activityLogger;
 
         public CreateProjectHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUserService = currentUserService;
+            _activityLogger = activityLogger;
         }
 
         public async Task<ProjectResponse> Handle(
@@ -53,6 +56,10 @@ namespace TaskFlow.Application.Features.Auth.Handlers
                     UserId = _currentUserService.UserId,
                     Role = ProjectMemberRole.Admin
                 });
+
+            await _activityLogger.LogAsync(
+                _currentUserService.UserId, "ProjectCreated", "Project",
+                project.Id, $"Created project \"{project.Name}\"", cancellationToken);
 
             await _context.SaveChangesAsync(
                 cancellationToken);

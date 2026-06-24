@@ -11,27 +11,24 @@ public sealed class GetProjectMembersHandler
 {
     private readonly IApplicationDbContext _context;
     private readonly ICurrentUserService _currentUser;
+    private readonly IProjectAuthorizationService _auth;
 
     public GetProjectMembersHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUser)
+        ICurrentUserService currentUser,
+        IProjectAuthorizationService projectAuthorizationService)
     {
         _context = context;
         _currentUser = currentUser;
+        _auth = projectAuthorizationService;
     }
 
     public async Task<List<ProjectMemberResponse>> Handle(
         GetProjectMembersQuery request,
         CancellationToken cancellationToken)
     {
-        bool hasAccess = await _context.ProjectMembers
-            .AnyAsync(x =>
-                x.ProjectId == request.ProjectId &&
-                x.UserId == _currentUser.UserId,
-                cancellationToken);
-
-        if (!hasAccess)
-            throw new UnauthorizedAccessException();
+        await _auth
+            .EnsureMemberAsync(request.ProjectId, cancellationToken);
 
         List<ProjectMemberResponse> members = await _context.ProjectMembers
             .AsNoTracking()

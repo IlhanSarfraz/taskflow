@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskFlow.Application.Common.Interfaces;
-using TaskFlow.Infrastructure.Auth;
+using TaskFlow.Infrastructure.Services;
 
 namespace TaskFlow.Infrastructure
 {
@@ -53,6 +53,7 @@ namespace TaskFlow.Infrastructure
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IProjectAuthorizationService, ProjectAuthorizationService>();
+            services.AddScoped<IActivityLogger, ActivityLogger>();
 
             return services;
         }

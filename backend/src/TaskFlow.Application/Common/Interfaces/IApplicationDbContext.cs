@@ -16,6 +16,8 @@ namespace TaskFlow.Application.Common.Interfaces
         DbSet<TaskAssignment> TaskAssignments { get; }
         DbSet<Invite> Invites { get; }
         DbSet<Notification> Notifications { get; }
+        DbSet<ActivityLog> ActivityLogs { get; }
+
         Task<int> SaveChangesAsync(
             CancellationToken cancellationToken = default);
     }

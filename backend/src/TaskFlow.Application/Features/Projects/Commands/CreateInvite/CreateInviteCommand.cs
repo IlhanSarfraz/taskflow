@@ -5,7 +5,7 @@ namespace TaskFlow.Application.Features.Projects.Commands.CreateInvite
 {
     public sealed record CreateInviteCommand(
         Guid ProjectId,
-        Guid InvitedUserId,
+        string InvitedEmail,
         ProjectMemberRole Role)
         : IRequest;
 }

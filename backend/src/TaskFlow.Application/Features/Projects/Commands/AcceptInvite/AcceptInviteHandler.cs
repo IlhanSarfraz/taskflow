@@ -11,13 +11,16 @@ namespace TaskFlow.Application.Features.Projects.Commands.AcceptInvite
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public AcceptInviteHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -78,6 +81,10 @@ namespace TaskFlow.Application.Features.Projects.Commands.AcceptInvite
                 RelatedEntityId = invite.Id,
                 IsRead = false
             });
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "InviteAccepted", "Project",
+                invite.ProjectId, $"Joined project \"{project?.Name}\"", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

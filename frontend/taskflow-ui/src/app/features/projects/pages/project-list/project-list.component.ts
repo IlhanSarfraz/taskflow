@@ -3,6 +3,8 @@ import { ProjectService } from '../../services/project.service';
 import { Project } from '../../models/project.model';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { ProjectRefreshService } from '../../../shared/services/project-refresh.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-project-list',
@@ -14,12 +16,23 @@ export class ProjectListComponent {
   private readonly projectService = inject(ProjectService)
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
-
+  private projectRefresh = inject(ProjectRefreshService);
+  private refreshSub?: Subscription;
+  
   projects: Project[] = [];
   loading = true;
 
   ngOnInit(): void {
     this.loadProjects();
+
+    this.refreshSub = this.projectRefresh.refresh$
+      .subscribe(() => {
+        this.loadProjects();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.refreshSub?.unsubscribe();
   }
 
   loadProjects(): void {

@@ -11,13 +11,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateTask
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public CreateTaskHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task<TaskResponse> Handle(
@@ -63,6 +66,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateTask
             };
 
             _context.Tasks.Add(task);
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "TaskCreated", "Task",
+                task.Id, $"Created task \"{task.Title}\"", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

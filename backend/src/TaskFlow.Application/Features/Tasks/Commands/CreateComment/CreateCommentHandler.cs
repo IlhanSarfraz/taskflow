@@ -12,15 +12,18 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateComment
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
         private readonly IProjectAuthorizationService _auth;
+        private readonly IActivityLogger _activityLogger;
 
         public CreateCommentHandler(
             IApplicationDbContext context,
             ICurrentUserService currentUser,
-            IProjectAuthorizationService auth)
+            IProjectAuthorizationService auth,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
             _auth = auth;
+            _activityLogger = activityLogger;
         }
 
         public async Task<CommentResponse> Handle(
@@ -48,6 +51,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateComment
             };
 
             _context.TaskComments.Add(comment);
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "CommentAdded", "Task",
+                request.TaskId, $"Commented on task", cancellationToken);
 
             await _context.SaveChangesAsync(
                 cancellationToken);

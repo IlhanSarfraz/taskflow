@@ -10,13 +10,16 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeleteProject
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public DeleteProjectHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -42,6 +45,10 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeleteProject
                 throw new UnauthorizedAccessException(
                     "You are not allowed to delete this project.");
             }
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "ProjectDeleted", "Project",
+                project.Id, $"Deleted project \"{project.Name}\"", cancellationToken);
 
             _context.Projects.Remove(project);
 

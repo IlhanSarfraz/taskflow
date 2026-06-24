@@ -11,13 +11,16 @@ namespace TaskFlow.Application.Features.Projects.Commands.AddProjectMember
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public AddProjectMemberHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -53,6 +56,10 @@ namespace TaskFlow.Application.Features.Projects.Commands.AddProjectMember
             };
 
             _context.ProjectMembers.Add(member);
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "MemberAdded", "Project",
+                request.ProjectId, $"Added user {request.UserId} to project", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

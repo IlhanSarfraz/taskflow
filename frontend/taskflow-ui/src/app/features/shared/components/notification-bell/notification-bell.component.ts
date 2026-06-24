@@ -5,6 +5,7 @@ import { NotificationBellService } from '../../services/notification-bell.servic
 import { InvitationService } from '../../../projects/services/invitation.service';
 import { AppNotification } from '../../models/notification.model';
 import { NotificationService } from '../../services/notification.service';
+import { ProjectRefreshService } from '../../services/project-refresh.service';
 
 @Component({
   selector: 'app-notification-bell',
@@ -17,7 +18,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   private invitationService = inject(InvitationService);
   private toast = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
-
+  private projectRefresh = inject(ProjectRefreshService);
   private sub?: Subscription;
 
   open = false;
@@ -61,6 +62,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
           next: () => {
             this.toast.success('Invite accepted');
             this.bellService.fetchNotifications().subscribe();
+            this.projectRefresh.triggerRefresh();
           },
           error: (err) => this.toast.error(err?.error?.message ?? 'Could not accept invite')
         });

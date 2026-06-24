@@ -10,13 +10,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateTask
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public UpdateTaskHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -38,6 +41,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateTask
             task.Description = request.Description;
             task.Priority = request.Priority;
             task.DueDate = request.DueDate;
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "TaskUpdated", "Task",
+                task.Id, $"Updated task \"{task.Title}\"", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

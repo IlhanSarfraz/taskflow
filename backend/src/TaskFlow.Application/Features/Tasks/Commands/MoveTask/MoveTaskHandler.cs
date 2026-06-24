@@ -10,13 +10,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.MoveTask
     {
         private readonly IApplicationDbContext _context;
         private readonly ICurrentUserService _currentUser;
+        private readonly IActivityLogger _activityLogger;
 
         public MoveTaskHandler(
             IApplicationDbContext context,
-            ICurrentUserService currentUser)
+            ICurrentUserService currentUser,
+            IActivityLogger activityLogger)
         {
             _context = context;
             _currentUser = currentUser;
+            _activityLogger = activityLogger;
         }
 
         public async Task Handle(
@@ -80,6 +83,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.MoveTask
 
             for (int i = 0; i < targetTasks.Count; i++)
                 targetTasks[i].Order = i;
+
+            await _activityLogger.LogAsync(
+                _currentUser.UserId, "TaskMoved", "Task",
+                task.Id, $"Moved task \"{task.Title}\" to column \"{targetColumn.Name}\"", cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }
