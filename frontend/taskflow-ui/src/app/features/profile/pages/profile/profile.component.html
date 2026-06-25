@@ -44,9 +44,18 @@
     <!-- Bottom grid: activity + settings -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      <!-- Recent activity -->
-      <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6">
-        <h3 class="text-white font-semibold mb-5">Recent Activity</h3>
+      <!-- Recent activity (preview card) -->
+      <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6 flex flex-col">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="text-white font-semibold">Recent Activity</h3>
+          <button
+            (click)="expandActivity()"
+            class="w-7 h-7 flex items-center justify-center rounded-md text-gray-500 hover:text-white hover:bg-[#252525] transition"
+            title="View all activity"
+          >
+            <i class="fa-solid fa-expand text-sm"></i>
+          </button>
+        </div>
 
         <div *ngIf="loadingActivity" class="text-gray-500 text-sm">Loading...</div>
 
@@ -54,7 +63,10 @@
           No activity yet.
         </div>
 
-        <ul *ngIf="!loadingActivity && activity.length > 0" class="space-y-4">
+        <ul
+          *ngIf="!loadingActivity && activity.length > 0"
+          class="space-y-4 overflow-y-auto max-h-[420px]"
+        >
           <li *ngFor="let item of activity" class="flex items-start gap-3">
             <span
               class="mt-1.5 w-2 h-2 rounded-full shrink-0"
@@ -106,13 +118,13 @@
             <div *ngIf="saveProfileError" class="text-red-400 text-xs">{{ saveProfileError }}</div>
             <div *ngIf="saveProfileSuccess" class="text-[#08CB00] text-xs">Changes saved.</div>
 
-            <button
-              (click)="saveProfile()"
-              [disabled]="savingProfile"
-              class="w-full py-2.5 rounded-lg bg-[#08CB00] hover:bg-green-600 disabled:opacity-50 text-black text-sm font-semibold transition"
-            >
-              {{ savingProfile ? 'Saving...' : 'Save Changes' }}
-            </button>
+          <button
+            (click)="saveProfile()"
+            [disabled]="!canSaveProfile"
+            class="w-full py-2.5 rounded-lg bg-[#08CB00] hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-black text-sm font-semibold transition"
+          >
+            {{ savingProfile ? 'Saving...' : 'Save Changes' }}
+          </button>
           </div>
         </div>
 
@@ -157,4 +169,85 @@
     </div>
 
   </ng-container>
+
+  <!-- ─── Fullscreen activity overlay ─────────────────────────────────────── -->
+  <div
+    *ngIf="activityExpanded"
+    class="fixed inset-0 z-50 bg-[#121212] flex flex-col animate-[fadeIn_0.15s_ease-out]"
+    role="dialog"
+    aria-modal="true"
+    aria-label="All activity"
+  >
+    <!-- Sticky header -->
+    <div class="shrink-0 border-b border-gray-800 bg-[#1a1a1a]">
+      <div class="max-w-2xl mx-auto px-6 py-5 flex items-center justify-between">
+        <div>
+          <h2 class="text-white text-lg font-semibold">All Activity</h2>
+          <p class="text-gray-500 text-xs mt-0.5">{{ activity.length }} events loaded</p>
+        </div>
+        <button
+          (click)="collapseActivity()"
+          class="w-9 h-9 flex items-center justify-center rounded-md text-gray-400 hover:text-white hover:bg-[#252525] transition"
+          title="Close (Esc)"
+        >
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="max-w-2xl mx-auto px-6 py-6">
+
+        <div *ngIf="loadingActivity" class="text-gray-500 text-sm py-12 text-center">
+          Loading activity...
+        </div>
+
+        <div *ngIf="!loadingActivity && activity.length === 0" class="text-gray-500 text-sm py-12 text-center">
+          No activity yet.
+        </div>
+
+        <div *ngIf="!loadingActivity && activity.length > 0" class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6 space-y-6">
+          <div *ngFor="let group of groupedActivity">
+            <h4 class="text-gray-500 text-xs font-semibold uppercase tracking-wide mb-2.5">
+              {{ group.label }}
+            </h4>
+            <ul class="space-y-2.5 border-l border-gray-800 ml-1">
+              <li *ngFor="let item of group.items" class="relative pl-5 py-0.5">
+                <span
+                  class="absolute left-[-4.5px] top-2 w-2 h-2 rounded-full ring-4 ring-[#1a1a1a] shrink-0"
+                  [ngClass]="getActivityDotColor(item.action)"
+                ></span>
+                <div class="flex items-center gap-2">
+                  <p class="text-gray-200 text-sm leading-snug">{{ item.description }}</p>
+                  <span
+                    *ngIf="item.count > 1"
+                    class="text-[11px] text-gray-400 bg-[#252525] px-1.5 py-0.5 rounded-full leading-none"
+                  >×{{ item.count }}</span>
+                </div>
+                <p class="text-gray-500 text-xs mt-0.5">{{ item.latestCreatedAtUtc | relativeTime }}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Load more -->
+        <div *ngIf="!loadingActivity && hasMoreActivity" class="pt-6 text-center">
+          <button
+            (click)="loadMoreActivity()"
+            [disabled]="loadingMoreActivity"
+            class="px-5 py-2 rounded-lg bg-[#1a1a1a] hover:bg-[#252525] border border-gray-700 text-gray-300 text-sm font-medium disabled:opacity-50 transition"
+          >
+            {{ loadingMoreActivity ? 'Loading...' : 'Load more' }}
+          </button>
+        </div>
+
+        <div *ngIf="!loadingActivity && !hasMoreActivity && activity.length > 0" class="pt-6 text-center text-gray-600 text-xs">
+          You've reached the end.
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
