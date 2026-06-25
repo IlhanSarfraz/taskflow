@@ -7,18 +7,20 @@ import { UserProfile } from '../../models/user-profile.model';
 import { ActivityLog } from '../../models/activity-log.model';
 import { UpdateProfileRequest } from '../../models/update-profile-request';
 import { ChangePasswordRequest } from '../../models/change-password-request';
+import { UtcDatePipe } from '../../../../pipes/utc-date.pipe';
+import { RelativeTimePipe } from '../../../../pipes/relative-time.pipe';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RelativeTimePipe, UtcDatePipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
 
   private readonly profileService = inject(ProfileService);
-  private readonly cdr = inject(ChangeDetectorRef)
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // ─── State ───────────────────────────────────────────────────────────────────
 
@@ -134,7 +136,6 @@ export class ProfileComponent implements OnInit {
         }
 
         this.loadActivity();
-
         this.cdr.markForCheck();
 
         setTimeout(() => {
@@ -144,9 +145,7 @@ export class ProfileComponent implements OnInit {
       },
       error: (err) => {
         this.savingProfile = false;
-        this.saveProfileError =
-          err?.error?.message ?? 'Failed to save changes.';
-
+        this.saveProfileError = err?.error?.message ?? 'Failed to save changes.';
         this.cdr.markForCheck();
       }
     });
@@ -180,7 +179,6 @@ export class ProfileComponent implements OnInit {
         this.confirmNewPassword = '';
 
         this.loadActivity();
-
         this.cdr.markForCheck();
 
         setTimeout(() => {
@@ -191,35 +189,12 @@ export class ProfileComponent implements OnInit {
       error: (err) => {
         this.savingPassword = false;
         this.savePasswordError = err?.error?.message ?? 'Failed to update password.';
+        this.cdr.markForCheck();
       }
     });
   }
 
   // ─── Activity helpers ─────────────────────────────────────────────────────────
-
-  getActivityIcon(action: string): string {
-    const icons: Record<string, string> = {
-      TaskCreated:     'fa-solid fa-plus',
-      TaskUpdated:     'fa-solid fa-pen',
-      TaskDeleted:     'fa-solid fa-trash',
-      TaskMoved:       'fa-solid fa-arrow-right',
-      TaskAssigned:    'fa-solid fa-user-check',
-      CommentAdded:    'fa-solid fa-comment',
-      CommentUpdated:  'fa-solid fa-comment-pen',
-      CommentDeleted:  'fa-solid fa-comment-slash',
-      ProjectCreated:  'fa-solid fa-folder-plus',
-      ProjectUpdated:  'fa-solid fa-folder-pen',
-      ProjectDeleted:  'fa-solid fa-folder-minus',
-      BoardCreated:    'fa-solid fa-table-columns',
-      InviteSent:      'fa-solid fa-paper-plane',
-      InviteAccepted:  'fa-solid fa-circle-check',
-      InviteDeclined:  'fa-solid fa-circle-xmark',
-      MemberAdded:     'fa-solid fa-user-plus',
-      MemberRemoved:   'fa-solid fa-user-minus',
-      PasswordChanged: 'fa-solid fa-lock',
-    };
-    return icons[action] ?? 'fa-solid fa-circle-dot';
-  }
 
   getActivityDotColor(action: string): string {
     if (action.includes('Deleted') || action.includes('Declined') || action.includes('Removed')) {
@@ -229,21 +204,5 @@ export class ProfileComponent implements OnInit {
       return 'bg-amber-400';
     }
     return 'bg-[#08CB00]';
-  }
-
-  getRelativeTime(dateStr: string): string {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1)   return 'Just now';
-    if (diffMins < 60)  return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays < 7)   return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 }

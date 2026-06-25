@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { TaskService } from '../../services/task.service';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,16 +6,17 @@ import { TaskDetails } from '../../models/task-details';
 import { FormsModule } from '@angular/forms';
 import { ProjectMember } from '../../../projects/models/project-member.model';
 import { CommentResponse } from '../../models/comment-response';
-import { TaskAssignee } from '../../models/task-assignee.model';
+import { RelativeTimePipe } from '../../../../pipes/relative-time.pipe';
+import { UtcDatePipe } from '../../../../pipes/utc-date.pipe';
 
 @Component({
   selector: 'app-task-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, RelativeTimePipe, UtcDatePipe],
   templateUrl: './task-details.component.html',
   styleUrl: './task-details.component.scss',
 })
-export class TaskDetailsComponent {
+export class TaskDetailsComponent implements OnInit {
 
   private taskService = inject(TaskService);
   private route = inject(ActivatedRoute);
@@ -67,21 +68,6 @@ export class TaskDetailsComponent {
       .slice(0, 2)
       .map(part => part[0]?.toUpperCase() ?? '')
       .join('');
-  }
-
-  getRelativeTime(dateStr: string): string {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-    if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   loadPage(taskId: string): void {

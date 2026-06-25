@@ -15,7 +15,7 @@
           <h2 class="text-white text-xl font-semibold">{{ fullName }}</h2>
           <p class="text-gray-400 text-sm">{{ profile.email }}</p>
           <p class="text-gray-600 text-xs mt-0.5">
-            Member since {{ profile.memberSinceUtc | date:'MMM yyyy' }}
+            Member since {{ profile.memberSinceUtc | utcDate:'MMM yyyy' }}
           </p>
         </div>
       </div>
@@ -56,16 +56,13 @@
 
         <ul *ngIf="!loadingActivity && activity.length > 0" class="space-y-4">
           <li *ngFor="let item of activity" class="flex items-start gap-3">
-            <!-- Dot -->
             <span
               class="mt-1.5 w-2 h-2 rounded-full shrink-0"
               [ngClass]="getActivityDotColor(item.action)"
             ></span>
-
-            <!-- Text -->
             <div class="min-w-0">
               <p class="text-gray-200 text-sm leading-snug">{{ item.description }}</p>
-              <p class="text-gray-500 text-xs mt-0.5">{{ getRelativeTime(item.createdAtUtc) }}</p>
+              <p class="text-gray-500 text-xs mt-0.5">{{ item.createdAtUtc | relativeTime }}</p>
             </div>
           </li>
         </ul>

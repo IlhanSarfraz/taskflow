@@ -78,7 +78,7 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <span class="text-white text-sm font-medium">{{ c.userName }}</span>
-                    <span class="text-gray-600 text-xs">{{ getRelativeTime(c.createdAt) }}</span>
+                    <span class="text-gray-600 text-xs">{{ c.createdAt | relativeTime }}</span>
                   </div>
 
                   <ng-container *ngIf="editingCommentId !== c.id">
@@ -159,7 +159,7 @@
           <p class="text-gray-500 text-sm mb-2">Due date</p>
           <div *ngIf="task.dueDate" class="flex items-center gap-2 text-white text-sm">
             <i class="fa-regular fa-calendar text-gray-500"></i>
-            <span>{{ task.dueDate | date:'MMM d, y' }}</span>
+            <span>{{ task.dueDate | utcDate:'MMM d, y' }}</span>
           </div>
           <span *ngIf="!task.dueDate" class="text-gray-600 text-sm">Not set</span>
         </div>
