@@ -1,3 +1,4 @@
+import { AttachmentResponse } from './attachment-response.model';
 import { TaskAssignee } from './task-assignee.model';
 
 export interface TaskDetails {
@@ -12,4 +13,5 @@ export interface TaskDetails {
   columnName: string;
   boardId: string;
   assignees: TaskAssignee[];
+  attachments: AttachmentResponse[];
 }

@@ -130,17 +130,58 @@
         <!-- Attachments -->
         <section>
           <h2 class="text-white font-semibold text-base mb-4">Attachments</h2>
-          <p class="text-gray-600 text-sm mb-4">No attachments yet.</p>
-          <button
-            type="button"
-            disabled
-            class="w-full max-w-md py-4 rounded-xl border border-dashed border-gray-700 text-gray-500 text-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+          <div *ngIf="attachmentError" class="text-red-400 text-xs mb-3">{{ attachmentError }}</div>
+
+          <div *ngIf="loadingAttachments" class="text-gray-500 text-sm mb-4">Loading attachments...</div>
+
+          <ul *ngIf="!loadingAttachments && task!.attachments?.length" class="space-y-2 mb-4 max-w-md">
+            <li
+              *ngFor="let a of task!.attachments"
+              class="flex items-center justify-between gap-3 bg-[#1a1a1a] border border-gray-800 rounded-lg px-3 py-2.5"
+            >
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div
+                  class="w-8 h-8 rounded-full bg-[#08CB00] text-black text-xs font-bold flex items-center justify-center shrink-0"
+                  [title]="a.uploadedByEmail"
+                >
+                  {{ getInitials(a.uploadedByName) }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-gray-200 text-sm truncate">{{ a.fileName }}</p>
+                  <p class="text-gray-500 text-xs mt-0.5">
+                    {{ formatFileSize(a.fileSize) }} · {{ a.uploadedByName }} · {{ a.createdAtUtc | relativeTime }}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                (click)="downloadAttachment(a)"
+                class="text-xs text-gray-400 hover:text-white px-2 py-1 rounded hover:bg-[#252525] transition shrink-0"
+              >
+                Download
+              </button>
+            </li>
+          </ul>
+
+          <p *ngIf="!loadingAttachments && !task!.attachments?.length" class="text-gray-600 text-sm mb-4">
+            No attachments yet.
+          </p>
+
+          <label
+            class="w-full max-w-md py-4 rounded-xl border border-dashed border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 text-sm flex items-center justify-center gap-2 cursor-pointer transition"
+            [class.opacity-50]="uploadingAttachment"
+            [class.cursor-not-allowed]="uploadingAttachment"
           >
             <i class="fa-solid fa-upload"></i>
-            Upload file
-          </button>
+            {{ uploadingAttachment ? 'Uploading...' : 'Upload file' }}
+            <input
+              type="file"
+              class="hidden"
+              [disabled]="uploadingAttachment"
+              (change)="onAttachmentSelected($event)"
+            />
+          </label>
         </section>
-      </div>
 
       <!-- Sidebar -->
       <aside class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 space-y-6 xl:sticky xl:top-6">
@@ -224,6 +265,7 @@
         </div>
 
       </aside>
+    </div>
     </div>
 
   </ng-container>

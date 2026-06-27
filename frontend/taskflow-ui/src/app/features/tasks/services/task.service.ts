@@ -9,6 +9,7 @@ import { CommentResponse } from "../models/comment-response";
 import { CreateCommentRequest } from "../models/create-comment-request";
 import { UpdateCommentRequest } from "../models/update-comment-request";
 import { TaskDetailPage } from "../models/task-detail-page.model";
+import { AttachmentResponse } from "../models/attachment-response.model";
 
 @Injectable({
     providedIn: `root`
@@ -66,28 +67,48 @@ export class TaskService{
     }
 
     CreateComment(taskId: string, request: CreateCommentRequest) {
-    return this.api.post<CommentResponse>(
-        `Tasks/taskId=${taskId}/comments`,
-        request
-    );
+        return this.api.post<CommentResponse>(
+            `Tasks/taskId=${taskId}/comments`,
+            request
+        );
     }
 
     GetComments(taskId: string) {
-    return this.api.get<CommentResponse[]>(
-        `Tasks/taskId=${taskId}/comments`
-    );
+        return this.api.get<CommentResponse[]>(
+            `Tasks/taskId=${taskId}/comments`
+        );
     }
 
     UpdateComment(commentId: string, request: UpdateCommentRequest) {
-    return this.api.put(
-        `Tasks/comments/commentId=${commentId}`,
-        request
-    );
+        return this.api.put(
+            `Tasks/comments/commentId=${commentId}`,
+            request
+        );
     }
 
     DeleteComment(commentId: string) {
-    return this.api.delete(
-        `Tasks/comments/commentId=${commentId}`
-    );
+        return this.api.delete(
+            `Tasks/comments/commentId=${commentId}`
+        );
+    }
+
+    UploadAttachment(taskId: string, file: File): Observable<string> {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        return this.api.post<string>(
+            `Tasks/${taskId}/attachments`,
+            formData
+        );
+    }
+
+    GetAttachments(taskId: string): Observable<AttachmentResponse[]> {
+        return this.api.get<AttachmentResponse[]>(
+            `Tasks/${taskId}/attachments`
+        );
+    }
+
+    DownloadAttachment(attachmentId: string): Observable<Blob> {
+        return this.api.getBlob(`Tasks/attachments/${attachmentId}/download`);
     }
 }

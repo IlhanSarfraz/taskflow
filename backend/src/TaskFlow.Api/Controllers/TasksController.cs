@@ -10,12 +10,15 @@ using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
 using TaskFlow.Application.Features.Tasks.Commands.ReorderTasks;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateComment;
 using TaskFlow.Application.Features.Tasks.Commands.UpdateTask;
+using TaskFlow.Application.Features.Tasks.Commands.UploadAttachment;
 using TaskFlow.Application.Features.Tasks.Dtos;
+using TaskFlow.Application.Features.Tasks.Queries.DownloadAttachment;
 using TaskFlow.Application.Features.Tasks.Queries.GetMyTasks;
 using TaskFlow.Application.Features.Tasks.Queries.GetProjectTasks;
-using TaskFlow.Application.Features.Tasks.Queries.GetTaskDetailPage;
+using TaskFlow.Application.Features.Tasks.Queries.GetTaskAttachments;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskById;
 using TaskFlow.Application.Features.Tasks.Queries.GetTaskComments;
+using TaskFlow.Application.Features.Tasks.Queries.GetTaskDetailPage;
 using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Api.Controllers
@@ -172,6 +175,37 @@ namespace TaskFlow.Api.Controllers
         {
             await _mediator.Send(command with { ColumnId = columnId });
             return NoContent();
+        }
+
+        [HttpPost("{taskId:guid}/attachments")]
+        public async Task<ActionResult<Guid>> UploadAttachment(
+            Guid taskId,
+            IFormFile file)
+        {
+            return Ok(await _mediator.Send(
+                new UploadAttachmentCommand(taskId, file)));
+        }
+
+        [HttpGet("{taskId:guid}/attachments")]
+        public async Task<ActionResult<List<TaskAttachmentDto>>> GetAttachments(
+            Guid taskId)
+        {
+            return Ok(await _mediator.Send(
+                new GetTaskAttachmentsQuery(taskId)));
+        }
+
+        [HttpGet("attachments/{attachmentId:guid}/download")]
+        public async Task<IActionResult> DownloadAttachment(
+            Guid attachmentId)
+        {
+            DownloadAttachmentResponse response =
+                await _mediator.Send(
+                    new DownloadAttachmentQuery(attachmentId));
+
+            return File(
+                response.Stream,
+                response.ContentType,
+                response.FileName);
         }
     }
 }

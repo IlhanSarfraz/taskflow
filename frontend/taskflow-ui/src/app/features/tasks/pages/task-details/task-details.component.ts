@@ -8,6 +8,7 @@ import { ProjectMember } from '../../../projects/models/project-member.model';
 import { CommentResponse } from '../../models/comment-response';
 import { RelativeTimePipe } from '../../../../pipes/relative-time.pipe';
 import { UtcDatePipe } from '../../../../pipes/utc-date.pipe';
+import { AttachmentResponse } from '../../models/attachment-response.model';
 
 @Component({
   selector: 'app-task-details',
@@ -33,6 +34,10 @@ export class TaskDetailsComponent implements OnInit {
   newComment = '';
   editingCommentId: string | null = null;
   editedComment = '';
+
+  uploadingAttachment = false;
+  attachmentError = '';
+  loadingAttachments = false;
 
   ngOnInit(): void {
     const taskId = this.route.snapshot.paramMap.get('taskId')!;
@@ -81,10 +86,30 @@ export class TaskDetailsComponent implements OnInit {
         this.selectedMemberId = '';
         this.loading = false;
         this.cdr.markForCheck();
+
+        // Detail page DTO doesn't include attachments yet — fetch separately.
+        this.loadAttachments(taskId);
       },
       error: (err) => {
         console.error(err);
         this.loading = false;
+      }
+    });
+  }
+
+  loadAttachments(taskId: string): void {
+    this.loadingAttachments = true;
+
+    this.taskService.GetAttachments(taskId).subscribe({
+      next: (attachments) => {
+        if (this.task) this.task.attachments = attachments;
+        this.loadingAttachments = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error(err);
+        this.loadingAttachments = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -136,7 +161,10 @@ export class TaskDetailsComponent implements OnInit {
         next: () => {
           this.taskService.GetTaskById(this.task!.id).subscribe({
             next: (task) => {
+              const previousAttachments = this.task?.attachments;
               this.task = task;
+              // GetTaskById doesn't return attachments either — preserve what we already loaded.
+              if (previousAttachments) this.task.attachments = previousAttachments;
               this.selectedMemberId = '';
               this.assigning = false;
               this.cdr.markForCheck();
@@ -196,5 +224,54 @@ export class TaskDetailsComponent implements OnInit {
         },
         error: (err) => console.error(err)
       });
+  }
+
+  // ─── Attachments ──────────────────────────────────────────────────────────
+
+  onAttachmentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // allow re-selecting the same file afterward
+
+    if (!file || !this.task) return;
+
+    this.attachmentError = '';
+    this.uploadingAttachment = true;
+
+    this.taskService.UploadAttachment(this.task.id, file).subscribe({
+      next: () => {
+        this.uploadingAttachment = false;
+        this.loadAttachments(this.task!.id);
+      },
+      error: (err) => {
+        this.uploadingAttachment = false;
+        this.attachmentError = err?.error?.message ?? 'Upload failed.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  formatFileSize(bytes: number): string {
+    return bytes < 1024 * 1024
+      ? `${Math.round(bytes / 1024)} KB`
+      : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  downloadAttachment(a: AttachmentResponse): void {
+    this.taskService.DownloadAttachment(a.id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = a.fileName;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error(err);
+        this.attachmentError = 'Failed to download file.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 }

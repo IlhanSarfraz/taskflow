@@ -24,6 +24,7 @@ namespace TaskFlow.Persistence.Context
         public DbSet<Invite> Invites => Set<Invite>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
+        public DbSet<TaskAttachment> TaskAttachments => Set<TaskAttachment>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

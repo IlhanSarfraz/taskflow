@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 import { environment } from "../../../environments/environment";
 
 @Injectable({
@@ -22,5 +23,9 @@ export class ApiService{
 
     delete<T>(url:string){
         return this.http.delete<T>(`${environment.apiUrl}/${url}`)
+    }
+
+    getBlob(url: string): Observable<Blob> {
+        return this.http.get(`${environment.apiUrl}/${url}`, { responseType: 'blob' });
     }
 }

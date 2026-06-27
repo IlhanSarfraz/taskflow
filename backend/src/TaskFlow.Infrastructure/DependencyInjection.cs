@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskFlow.Application.Common.Interfaces;
+using TaskFlow.Infrastructure.Options;
 using TaskFlow.Infrastructure.Services;
 
 namespace TaskFlow.Infrastructure
@@ -17,6 +18,9 @@ namespace TaskFlow.Infrastructure
             // JWT Settings
             services.Configure<JwtSettings>(
                 configuration.GetSection("Jwt"));
+
+            services.Configure<CloudinaryOptions>(
+                configuration.GetSection("Cloudinary"));
 
             JwtSettings jwtSettings = configuration
                 .GetSection("Jwt")
@@ -54,6 +58,7 @@ namespace TaskFlow.Infrastructure
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IProjectAuthorizationService, ProjectAuthorizationService>();
             services.AddScoped<IActivityLogger, ActivityLogger>();
+            services.AddScoped<IFileStorageService, CloudinaryFileStorageService>();
 
             return services;
         }
