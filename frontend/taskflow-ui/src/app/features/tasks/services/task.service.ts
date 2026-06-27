@@ -109,6 +109,14 @@ export class TaskService{
     }
 
     DownloadAttachment(attachmentId: string): Observable<Blob> {
-        return this.api.getBlob(`Tasks/attachments/${attachmentId}/download`);
+        return this.api.getBlob(
+            `Tasks/attachments/${attachmentId}/download`
+        );
+    }
+
+    DeleteAttachment(attachmentId: string) {
+        return this.api.delete(
+            `Tasks/attachments/${attachmentId}`
+        );
     }
 }

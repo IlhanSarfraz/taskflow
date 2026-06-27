@@ -50,10 +50,18 @@ public sealed class CloudinaryFileStorageService
     }
 
     public async Task DeleteAsync(
-        string url,
+        string publicId,
         CancellationToken cancellationToken = default)
     {
-        // We'll implement this when deleting attachments.
-        await Task.CompletedTask;
+        DeletionParams deleteParams = new(publicId)
+        {
+            ResourceType = ResourceType.Raw
+        };
+
+        DeletionResult result =
+            await _cloudinary.DestroyAsync(deleteParams);
+
+        if (result.Result != "ok")
+            throw new Exception("Unable to delete attachment.");
     }
 }

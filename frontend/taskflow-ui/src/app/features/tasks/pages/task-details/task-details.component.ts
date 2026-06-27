@@ -38,6 +38,7 @@ export class TaskDetailsComponent implements OnInit {
   uploadingAttachment = false;
   attachmentError = '';
   loadingAttachments = false;
+  deletingAttachmentId: string | null = null;
 
   ngOnInit(): void {
     const taskId = this.route.snapshot.paramMap.get('taskId')!;
@@ -270,6 +271,29 @@ export class TaskDetailsComponent implements OnInit {
       error: (err) => {
         console.error(err);
         this.attachmentError = 'Failed to download file.';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  deleteAttachment(a: AttachmentResponse): void {
+    if (!this.task) return;
+    if (!confirm(`Delete "${a.fileName}"?`)) return;
+
+    this.deletingAttachmentId = a.id;
+    this.attachmentError = '';
+
+    this.taskService.DeleteAttachment(a.id).subscribe({
+      next: () => {
+        if (this.task?.attachments) {
+          this.task.attachments = this.task.attachments.filter(x => x.id !== a.id);
+        }
+        this.deletingAttachmentId = null;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.deletingAttachmentId = null;
+        this.attachmentError = err?.error?.message ?? 'Failed to delete attachment.';
         this.cdr.markForCheck();
       }
     });

@@ -134,7 +134,7 @@
 
           <div *ngIf="loadingAttachments" class="text-gray-500 text-sm mb-4">Loading attachments...</div>
 
-          <ul *ngIf="!loadingAttachments && task!.attachments?.length" class="space-y-2 mb-4 max-w-md">
+          <ul *ngIf="!loadingAttachments && task!.attachments!.length" class="space-y-2 mb-4 max-w-md">
             <li
               *ngFor="let a of task!.attachments"
               class="flex items-center justify-between gap-3 bg-[#1a1a1a] border border-gray-800 rounded-lg px-3 py-2.5"
@@ -153,17 +153,28 @@
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                (click)="downloadAttachment(a)"
-                class="text-xs text-gray-400 hover:text-white px-2 py-1 rounded hover:bg-[#252525] transition shrink-0"
-              >
-                Download
-              </button>
+              <div class="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  (click)="downloadAttachment(a)"
+                  [disabled]="deletingAttachmentId === a.id"
+                  class="text-xs text-gray-400 hover:text-white px-2 py-1 rounded hover:bg-[#252525] transition disabled:opacity-40"
+                >
+                  Download
+                </button>
+                <button
+                  type="button"
+                  (click)="deleteAttachment(a)"
+                  [disabled]="deletingAttachmentId === a.id"
+                  class="text-xs text-gray-500 hover:text-red-400 px-2 py-1 rounded hover:bg-[#252525] transition disabled:opacity-40"
+                >
+                  {{ deletingAttachmentId === a.id ? 'Deleting...' : 'Delete' }}
+                </button>
+              </div>
             </li>
           </ul>
 
-          <p *ngIf="!loadingAttachments && !task!.attachments?.length" class="text-gray-600 text-sm mb-4">
+          <p *ngIf="!loadingAttachments && !task!.attachments!.length" class="text-gray-600 text-sm mb-4">
             No attachments yet.
           </p>
 

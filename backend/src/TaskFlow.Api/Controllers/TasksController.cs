@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Application.Features.Tasks.Commands.AssignTask;
 using TaskFlow.Application.Features.Tasks.Commands.CreateComment;
 using TaskFlow.Application.Features.Tasks.Commands.CreateTask;
+using TaskFlow.Application.Features.Tasks.Commands.DeleteAttachment;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteComment;
 using TaskFlow.Application.Features.Tasks.Commands.DeleteTask;
 using TaskFlow.Application.Features.Tasks.Commands.MoveTask;
@@ -206,6 +207,16 @@ namespace TaskFlow.Api.Controllers
                 response.Stream,
                 response.ContentType,
                 response.FileName);
+        }
+
+        [HttpDelete("attachments/{attachmentId:guid}")]
+        public async Task<IActionResult> DeleteAttachment(
+            Guid attachmentId)
+        {
+            await _mediator.Send(
+                new DeleteAttachmentCommand(attachmentId));
+
+            return NoContent();
         }
     }
 }
