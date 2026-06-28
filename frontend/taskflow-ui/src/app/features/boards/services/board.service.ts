@@ -87,4 +87,10 @@ export class BoardService {
       }
     );
   }
+
+  setDoneColumn(boardId: string, columnId: string) {
+    return this.api.patch<void>(
+      `Boards/${boardId}/done-column/${columnId}`
+    );
+  }
 }

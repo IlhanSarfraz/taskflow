@@ -15,6 +15,8 @@ namespace TaskFlow.Domain.Entities
 
         public DateTime? DueDate { get; set; }
 
+        public DateTime? CompletedAtUtc { get; set; }
+
         public Guid ProjectId { get; set; }
 
         public Project Project { get; set; } = null!;

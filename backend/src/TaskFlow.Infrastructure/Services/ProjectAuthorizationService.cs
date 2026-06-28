@@ -98,4 +98,19 @@ public sealed class ProjectAuthorizationService : IProjectAuthorizationService
                     "You are not a project member");
         }
     }
+
+    public async Task<List<Guid>> GetAccessibleProjectIdsAsync(CancellationToken cancellationToken = default)
+    {
+        List<Guid> memberProjectIds = await _context.ProjectMembers
+            .Where(x => x.UserId == _currentUser.UserId)
+            .Select(x => x.ProjectId)
+            .ToListAsync(cancellationToken);
+
+        List<Guid> ownedProjectIds = await _context.Projects
+            .Where(x => x.OwnerId == _currentUser.UserId)
+            .Select(x => x.Id)
+            .ToListAsync(cancellationToken);
+
+        return memberProjectIds.Union(ownedProjectIds).ToList();
+    }
 }

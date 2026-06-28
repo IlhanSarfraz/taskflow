@@ -43,6 +43,7 @@ namespace TaskFlow.Application.Features.Boards.Queries.GetBoardById
                             c.Id,
                             c.Name,
                             c.Order,
+                            c.IsDoneColumn,
                             c.Tasks
                                 .OrderBy(t => t.Order)
                                 .Select(t => new TaskSummaryResponse(

@@ -266,4 +266,21 @@ export class BoardDetailsComponent implements OnInit {
       error: (err) => console.error(err)
     });
   }
+
+  markAsDoneColumn(columnId: string): void {
+    if (!this.board) return;
+
+    this.boardService
+      .setDoneColumn(this.board.id, columnId)
+      .subscribe({
+        next: () => {
+          this.board!.column.forEach(c => {
+            c.isDoneColumn = c.id === columnId;
+          });
+
+          this.cdr.markForCheck();
+        },
+        error: err => console.error(err)
+      });
+  }
 }

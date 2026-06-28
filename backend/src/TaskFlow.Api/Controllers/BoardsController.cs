@@ -6,6 +6,7 @@ using TaskFlow.Application.Features.Boards.Commands.CreateColumn;
 using TaskFlow.Application.Features.Boards.Commands.DeleteColumn;
 using TaskFlow.Application.Features.Boards.Commands.RenameColumn;
 using TaskFlow.Application.Features.Boards.Commands.ReorderColumns;
+using TaskFlow.Application.Features.Boards.Commands.SetDoneColumn;
 using TaskFlow.Application.Features.Boards.Queries.GetBoardById;
 using TaskFlow.Application.Features.Boards.Queries.GetBoardsByProject;
 
@@ -86,6 +87,17 @@ namespace TaskFlow.Api.Controllers
                 return BadRequest("BoardId mismatch");
 
             await _mediator.Send(command);
+            return NoContent();
+        }
+
+        [HttpPatch("{boardId:guid}/done-column/{columnId:guid}")]
+        public async Task<IActionResult> SetDoneColumn(
+            Guid boardId,
+            Guid columnId)
+        {
+            await _mediator.Send(
+                new SetDoneColumnCommand(boardId, columnId));
+
             return NoContent();
         }
     }

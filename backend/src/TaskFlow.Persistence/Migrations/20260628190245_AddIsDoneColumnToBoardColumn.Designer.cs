@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskFlow.Persistence.Context;
 
@@ -10,9 +11,11 @@ using TaskFlow.Persistence.Context;
 namespace TaskFlow.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260628190245_AddIsDoneColumnToBoardColumn")]
+    partial class AddIsDoneColumnToBoardColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
@@ -407,9 +410,6 @@ namespace TaskFlow.Persistence.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("BoardColumnId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("CompletedAtUtc")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAtUtc")

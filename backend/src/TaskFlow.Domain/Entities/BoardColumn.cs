@@ -10,6 +10,8 @@ public sealed class BoardColumn : BaseEntity
 
     public Guid BoardId { get; set; }
 
+    public bool IsDoneColumn { get; set; }
+
     public Board Board { get; set; } = null!;
 
     public ICollection<TaskItem> Tasks { get; set; }

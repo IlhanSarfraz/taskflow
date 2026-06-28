@@ -6,5 +6,6 @@ namespace TaskFlow.Application.Features.Boards.DTOs
         Guid Id,
         string Name,
         int Order,
+        bool IsDoneColumn,
         IReadOnlyCollection<TaskSummaryResponse> Tasks);
 }
