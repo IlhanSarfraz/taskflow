@@ -30,6 +30,17 @@ export const routes: Routes = [
         .then(m => m.DashboardLayoutComponent),
     children: [
       {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => 
+          import('./features/dashboard/pages/dashboard.component')
+            .then(m => m.DashboardComponent)
+      },
+      {
         path: 'projects',
         loadComponent: () =>
           import('./features/projects/pages/project-list/project-list.component')
@@ -94,7 +105,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/profile/pages/profile/profile.component')
             .then(m => m.ProfileComponent)
-      }
+      }      
     ]
   }
 ];

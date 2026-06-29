@@ -1,0 +1,104 @@
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+
+  <div *ngIf="loading" class="text-gray-400 text-sm">Loading dashboard...</div>
+
+  <ng-container *ngIf="!loading && overview">
+
+    <!-- Greeting -->
+    <div>
+      <h1 class="text-white text-2xl font-semibold">{{ greeting }}</h1>
+      <p class="text-gray-500 text-sm mt-1">
+        {{ overview.assignedCount }} assigned &middot;
+        {{ overview.dueTodayCount }} due today &middot;
+        {{ overview.overdueCount }} overdue
+      </p>
+    </div>
+
+    <!-- Stat row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+        <p class="text-gray-400 text-sm">Assigned</p>
+        <p class="text-white text-3xl font-bold mt-1">{{ overview.assignedCount }}</p>
+      </div>
+      <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+        <p class="text-gray-400 text-sm">Due today</p>
+        <p class="text-amber-400 text-3xl font-bold mt-1">{{ overview.dueTodayCount }}</p>
+      </div>
+      <div class="bg-[#1a1a1a] border border-red-900/60 rounded-xl p-5">
+        <p class="text-red-400 text-sm">Overdue</p>
+        <p class="text-red-400 text-3xl font-bold mt-1">{{ overview.overdueCount }}</p>
+      </div>
+      <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+        <p class="text-gray-400 text-sm">Completed this week</p>
+        <p class="text-[#08CB00] text-3xl font-bold mt-1">{{ overview.completedThisWeekCount }}</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-4">
+
+      <!-- Due today & overdue -->
+      <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+        <h3 class="text-white font-semibold mb-3">Due today &amp; overdue</h3>
+
+        <div *ngIf="overview.dueOrOverdueTasks.length === 0" class="text-gray-500 text-sm py-2">
+          Nothing due — you're all caught up.
+        </div>
+
+        <div
+          *ngFor="let t of overview.dueOrOverdueTasks; let last = last"
+          (click)="goToTask(t)"
+          class="flex items-center justify-between gap-3 py-2.5 cursor-pointer hover:bg-[#1f1f1f] rounded-lg px-1 -mx-1 transition"
+          [class.border-b]="!last"
+          [class.border-gray-800]="!last"
+        >
+          <div class="min-w-0">
+            <p class="text-gray-200 text-sm">{{ t.title }}</p>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="bg-[#202020] text-gray-400 text-[11px] px-1.5 py-0.5 rounded">{{ t.projectName }}</span>
+              <i class="fa-solid fa-chevron-right text-gray-600 text-[9px]"></i>
+              <span class="bg-[#202020] text-gray-400 text-[11px] px-1.5 py-0.5 rounded">{{ t.boardName }}</span>
+            </div>
+          </div>
+          <span
+            class="text-xs shrink-0"
+            [class.text-red-400]="t.isOverdue"
+            [class.text-amber-400]="!t.isOverdue"
+          >
+            {{ dueLabel(t) }}
+          </span>
+        </div>
+      </div>
+
+    <!-- My projects -->
+    <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+    <h3 class="text-white font-semibold mb-3">My projects</h3>
+
+    <p *ngIf="overview.projects.length === 0" class="text-gray-600 text-sm">
+        No projects yet.
+    </p>
+
+    <div
+        *ngFor="let p of overview.projects; let last = last"
+        (click)="goToProject(p)"
+        class="cursor-pointer hover:bg-[#1f1f1f] rounded-lg px-1 -mx-1 py-1.5 transition"
+        [class.mb-3]="!last"
+    >
+        <div class="flex justify-between text-sm mb-1.5">
+        <span class="text-gray-200">{{ p.projectName }}</span>
+        <span class="text-gray-500">{{ p.progressPercent }}%</span>
+        </div>
+        <div class="bg-[#262626] rounded h-1.5 overflow-hidden">
+        <div class="bg-[#08CB00] h-1.5 transition-all" [style.width.%]="p.progressPercent"></div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Project activity — NOT WIRED YET, no backend endpoint exists for this -->
+    <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+      <h3 class="text-white font-semibold mb-3">Project activity</h3>
+      <p class="text-gray-600 text-sm">Activity feed coming soon.</p>
+    </div>
+
+  </ng-container>
+</div>

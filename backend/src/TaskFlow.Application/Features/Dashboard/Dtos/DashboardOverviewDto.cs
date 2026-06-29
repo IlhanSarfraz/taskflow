@@ -1,4 +1,4 @@
-﻿namespace TaskFlow.Application.Features.Dashboard.Dtos;
+﻿using TaskFlow.Application.Features.Dashboard.Dtos;
 
 public sealed class DashboardOverviewDto
 {
@@ -7,4 +7,5 @@ public sealed class DashboardOverviewDto
     public int OverdueCount { get; init; }
     public int CompletedThisWeekCount { get; init; }
     public List<DueTaskDto> DueOrOverdueTasks { get; init; } = new();
+    public List<ProjectProgressDto> Projects { get; init; } = new();
 }

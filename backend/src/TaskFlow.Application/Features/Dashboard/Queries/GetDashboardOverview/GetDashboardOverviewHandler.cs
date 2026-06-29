@@ -72,13 +72,30 @@ public sealed class GetDashboardOverviewHandler
             })
             .ToListAsync(cancellationToken);
 
+        // Progress per project the user can access. Starts from Projects, not Tasks,
+        // so a project with no tasks yet still shows up at 0% instead of disappearing.
+        List<ProjectProgressDto> projectProgress = await _context.Projects
+            .Where(p => projectIds.Contains(p.Id))
+            .Select(p => new ProjectProgressDto
+            {
+                ProjectId = p.Id,
+                ProjectName = p.Name,
+                TotalTaskCount = p.Tasks.Count,
+                CompletedTaskCount = p.Tasks.Count(t => t.BoardColumn.IsDoneColumn),
+                ProgressPercent = p.Tasks.Count == 0
+                    ? 0
+                    : (int)Math.Round(p.Tasks.Count(t => t.BoardColumn.IsDoneColumn) * 100.0 / p.Tasks.Count)
+            })
+            .ToListAsync(cancellationToken);
+
         return new DashboardOverviewDto
         {
             AssignedCount = assignedCount,
             DueTodayCount = dueTodayCount,
             OverdueCount = overdueCount,
             CompletedThisWeekCount = completedThisWeekCount,
-            DueOrOverdueTasks = dueOrOverdueTasks
+            DueOrOverdueTasks = dueOrOverdueTasks,
+            Projects = projectProgress
         };
     }
 }
