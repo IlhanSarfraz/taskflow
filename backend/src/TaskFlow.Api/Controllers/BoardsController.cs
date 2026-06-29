@@ -7,6 +7,7 @@ using TaskFlow.Application.Features.Boards.Commands.DeleteColumn;
 using TaskFlow.Application.Features.Boards.Commands.RenameColumn;
 using TaskFlow.Application.Features.Boards.Commands.ReorderColumns;
 using TaskFlow.Application.Features.Boards.Commands.SetDoneColumn;
+using TaskFlow.Application.Features.Boards.Commands.UnsetDoneColumn;
 using TaskFlow.Application.Features.Boards.Queries.GetBoardById;
 using TaskFlow.Application.Features.Boards.Queries.GetBoardsByProject;
 
@@ -97,6 +98,14 @@ namespace TaskFlow.Api.Controllers
         {
             await _mediator.Send(
                 new SetDoneColumnCommand(boardId, columnId));
+
+            return NoContent();
+        }
+
+        [HttpPatch("{boardId:guid}/done-column/unset")]
+        public async Task<IActionResult> UnsetDoneColumn(Guid boardId)
+        {
+            await _mediator.Send(new UnsetDoneColumnCommand(boardId));
 
             return NoContent();
         }

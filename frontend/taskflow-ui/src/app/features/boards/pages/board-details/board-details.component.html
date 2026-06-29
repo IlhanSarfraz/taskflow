@@ -158,10 +158,10 @@
 
                 <button
                   *ngIf="column.isDoneColumn"
-                  disabled
-                  class="w-full text-left px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
+                  (click)="unsetDoneColumn(); closeColumnMenu()"
+                  class="w-full text-left px-3 py-2 text-sm text-amber-300 hover:bg-[#333]"
                 >
-                  Current Done Column
+                  Remove Done Column
                 </button>
 
                 <button

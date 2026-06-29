@@ -93,4 +93,11 @@ export class BoardService {
       `Boards/${boardId}/done-column/${columnId}`
     );
   }
+
+  unsetDoneColumn(boardId: string) {
+    return this.api.patch<void>(
+      `boards/${boardId}/done-column/unset`,
+      {}
+    );
+  }
 }
