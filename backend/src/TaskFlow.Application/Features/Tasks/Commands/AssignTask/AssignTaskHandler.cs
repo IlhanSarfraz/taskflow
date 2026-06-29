@@ -27,15 +27,16 @@ public sealed class AssignTaskHandler
         AssignTaskCommand request,
         CancellationToken cancellationToken)
     {
-        TaskItem? task = await _context.Tasks
+        TaskItem task = await _context.Tasks
             .Include(x => x.Project)
+                .ThenInclude(p => p.Members)
             .Include(x => x.Assignments)
             .FirstOrDefaultAsync(
                 x => x.Id == request.TaskId &&
-                    (
-                        x.Project.OwnerId == _currentUser.UserId ||
-                        x.Project.Members.Any(m => m.UserId == _currentUser.UserId)
-                    ),
+                     (
+                         x.Project.OwnerId == _currentUser.UserId ||
+                         x.Project.Members.Any(m => m.UserId == _currentUser.UserId)
+                     ),
                 cancellationToken)
             ?? throw new KeyNotFoundException("Task not found.");
 
@@ -43,17 +44,16 @@ public sealed class AssignTaskHandler
             .Distinct()
             .ToList();
 
-        if (assigneeIds.Count > 0)
-        {
-            int memberCount = await _context.ProjectMembers
-                .CountAsync(x =>
-                    x.ProjectId == task.ProjectId &&
-                    assigneeIds.Contains(x.UserId),
-                    cancellationToken);
+        // Owner + every project member (Admins and Members)
+        HashSet<Guid> validAssignees = task.Project.Members
+            .Select(m => m.UserId)
+            .Append(task.Project.OwnerId)
+            .ToHashSet();
 
-            if (memberCount != assigneeIds.Count)
-                throw new InvalidOperationException(
-                    "One or more users are not members of this project.");
+        if (assigneeIds.Any(id => !validAssignees.Contains(id)))
+        {
+            throw new InvalidOperationException(
+                "One or more users are not members of this project.");
         }
 
         _context.TaskAssignments.RemoveRange(
@@ -75,8 +75,12 @@ public sealed class AssignTaskHandler
         task.AssigneeId = assigneeIds.FirstOrDefault();
 
         await _activityLogger.LogAsync(
-            _currentUser.UserId, "TaskAssigned", "Task",
-            task.Id, $"Updated assignments for task \"{task.Title}\"", cancellationToken);
+            _currentUser.UserId,
+            "TaskAssigned",
+            "Task",
+            task.Id,
+            $"Updated assignments for task \"{task.Title}\"",
+            cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
     }
