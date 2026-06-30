@@ -26,10 +26,11 @@ public sealed class SetDoneColumnHandler
     }
 
     public async Task Handle(
-        SetDoneColumnCommand request,
-        CancellationToken cancellationToken)
+    SetDoneColumnCommand request,
+    CancellationToken cancellationToken)
     {
         Board board = await _context.Boards
+            .Include(x => x.Project)                       // ← add
             .FirstOrDefaultAsync(
                 x => x.Id == request.BoardId,
                 cancellationToken)
@@ -63,9 +64,7 @@ public sealed class SetDoneColumnHandler
                 .ToListAsync(cancellationToken);
 
             foreach (TaskItem task in oldTasks)
-            {
                 task.CompletedAtUtc = null;
-            }
         }
 
         // Tasks entering Done
@@ -74,9 +73,7 @@ public sealed class SetDoneColumnHandler
             .ToListAsync(cancellationToken);
 
         foreach (TaskItem task in newTasks)
-        {
             task.CompletedAtUtc ??= DateTime.UtcNow;
-        }
 
         await _activityLogger.LogAsync(
             _currentUser.UserId,
@@ -84,6 +81,10 @@ public sealed class SetDoneColumnHandler
             "Board",
             board.Id,
             $"Changed Done column to \"{newDoneColumn.Name}\".",
+            board.ProjectId,
+            board.Project.Name,
+            board.Id,
+            board.Name,
             cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);

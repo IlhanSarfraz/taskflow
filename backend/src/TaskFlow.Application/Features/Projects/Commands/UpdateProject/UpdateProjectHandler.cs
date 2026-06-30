@@ -45,7 +45,7 @@ namespace TaskFlow.Application.Features.Projects.Commands.UpdateProject
 
             await _activityLogger.LogAsync(
                 _currentUser.UserId, "ProjectUpdated", "Project",
-                project.Id, $"Updated project \"{project.Name}\"", cancellationToken);
+                project.Id, $"Updated project \"{project.Name}\"", project.Id, project.Name, null, null, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

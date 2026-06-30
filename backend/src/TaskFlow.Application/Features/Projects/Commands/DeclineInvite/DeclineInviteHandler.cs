@@ -75,7 +75,7 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeclineInvite
 
             await _activityLogger.LogAsync(
                 _currentUser.UserId, "InviteDeclined", "Project",
-                invite.ProjectId, $"Declined invite to \"{project?.Name}\"", cancellationToken);
+                invite.ProjectId, $"Declined invite to \"{project?.Name}\"", project?.Id, project?.Name, null, null, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

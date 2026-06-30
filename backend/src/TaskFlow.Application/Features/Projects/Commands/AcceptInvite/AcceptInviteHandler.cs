@@ -84,7 +84,7 @@ namespace TaskFlow.Application.Features.Projects.Commands.AcceptInvite
 
             await _activityLogger.LogAsync(
                 _currentUser.UserId, "InviteAccepted", "Project",
-                invite.ProjectId, $"Joined project \"{project?.Name}\"", cancellationToken);
+                invite.ProjectId, $"Joined project \"{project?.Name}\"", invite.ProjectId, project?.Name, null, null, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

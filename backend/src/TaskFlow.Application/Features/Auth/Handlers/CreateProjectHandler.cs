@@ -59,7 +59,7 @@ namespace TaskFlow.Application.Features.Auth.Handlers
 
             await _activityLogger.LogAsync(
                 _currentUserService.UserId, "ProjectCreated", "Project",
-                project.Id, $"Created project \"{project.Name}\"", cancellationToken);
+                project.Id, $"Created project \"{project.Name}\"", project.Id, project.Name, null, null, cancellationToken);
 
             await _context.SaveChangesAsync(
                 cancellationToken);

@@ -8,4 +8,5 @@ public sealed class DashboardOverviewDto
     public int CompletedThisWeekCount { get; init; }
     public List<DueTaskDto> DueOrOverdueTasks { get; init; } = new();
     public List<ProjectProgressDto> Projects { get; init; } = new();
+    public List<ProjectActivityDto> Activity { get; init; } = new();
 }

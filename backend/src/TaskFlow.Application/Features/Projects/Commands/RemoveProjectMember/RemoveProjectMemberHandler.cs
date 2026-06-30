@@ -29,8 +29,7 @@ namespace TaskFlow.Application.Features.Projects.Commands.RemoveProjectMember
             RemoveProjectMemberCommand request,
             CancellationToken cancellationToken)
         {
-            await _auth
-                .EnsureProjectManagerAsync(request.ProjectId, cancellationToken);
+            await _auth.EnsureProjectManagerAsync(request.ProjectId, cancellationToken);
 
             ProjectMember? member = await _context.ProjectMembers
                 .FirstOrDefaultAsync(x =>
@@ -41,11 +40,27 @@ namespace TaskFlow.Application.Features.Projects.Commands.RemoveProjectMember
             if (member == null)
                 return;
 
+            Project project = await _context.Projects
+                .FirstOrDefaultAsync(x => x.Id == request.ProjectId, cancellationToken)
+                ?? throw new KeyNotFoundException("Project not found.");
+
+            User removedUser = await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken)
+                ?? throw new KeyNotFoundException("User not found.");
+
             _context.ProjectMembers.Remove(member);
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "MemberRemoved", "Project",
-                request.ProjectId, $"Removed user {request.UserId} from project", cancellationToken);
+                _currentUser.UserId,
+                "MemberRemoved",
+                "Project",
+                request.ProjectId,
+                $"Removed {removedUser.FirstName} {removedUser.LastName} from project",
+                request.ProjectId,
+                project.Name,
+                null,
+                null,
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

@@ -18,6 +18,18 @@ export interface ProjectProgress {
   progressPercent: number;
 }
 
+export interface ProjectActivity {
+  id: string;
+  action: string;
+  description: string;
+  actorName: string;
+  projectId: string | null;
+  projectName: string | null;
+  boardId: string | null;
+  boardName: string | null;
+  createdAtUtc: string;
+}
+
 export interface DashboardOverview {
   assignedCount: number;
   dueTodayCount: number;
@@ -25,4 +37,5 @@ export interface DashboardOverview {
   completedThisWeekCount: number;
   dueOrOverdueTasks: DueTask[];
   projects: ProjectProgress[];
+  activity: ProjectActivity[];
 }

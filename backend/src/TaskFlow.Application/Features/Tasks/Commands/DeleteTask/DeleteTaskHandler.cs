@@ -28,6 +28,8 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteTask
         {
             TaskItem task = await _context.Tasks
                 .Include(x => x.Project)
+                .Include(x => x.BoardColumn)
+                    .ThenInclude(bc => bc.Board)
                 .FirstOrDefaultAsync(
                     x => x.Id == request.TaskId &&
                        (
@@ -38,8 +40,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteTask
                 ?? throw new KeyNotFoundException("Task not found.");
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "TaskDeleted", "Task",
-                task.Id, $"Deleted task \"{task.Title}\"", cancellationToken);
+                _currentUser.UserId,
+                "TaskDeleted",
+                "Task",
+                task.Id,
+                $"Deleted task \"{task.Title}\"",
+                task.ProjectId,
+                task.Project.Name,
+                task.BoardColumn.BoardId,
+                task.BoardColumn.Board.Name,
+                cancellationToken);
 
             _context.Tasks.Remove(task);
 

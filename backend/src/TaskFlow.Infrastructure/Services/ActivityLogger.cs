@@ -18,6 +18,10 @@ public sealed class ActivityLogger : IActivityLogger
         string entityType,
         Guid entityId,
         string description,
+        Guid? projectId,
+        string? projectName,
+        Guid? boardId,
+        string? boardName,
         CancellationToken cancellationToken = default)
     {
         _context.ActivityLogs.Add(new ActivityLog
@@ -26,7 +30,11 @@ public sealed class ActivityLogger : IActivityLogger
             Action = action,
             EntityType = entityType,
             EntityId = entityId,
-            Description = description
+            Description = description,
+            ProjectId = projectId,
+            ProjectName = projectName,
+            BoardId = boardId,
+            BoardName = boardName
         });
     }
 }

@@ -2,12 +2,13 @@ import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DashboardService } from '../services/dashboard.service';
-import { DashboardOverview, DueTask, ProjectProgress } from '../models/dashboard-overview.model';
+import { DashboardOverview, DueTask, ProjectActivity, ProjectProgress } from '../models/dashboard-overview.model';
+import { RelativeTimePipe } from '../../../pipes/relative-time.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RelativeTimePipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -19,6 +20,10 @@ export class DashboardComponent implements OnInit {
 
   overview?: DashboardOverview;
   loading = true;
+
+  // Used to substitute "You" for the current user's name in the feed.
+  private readonly currentUserName =
+    `${localStorage.getItem('firstName') ?? ''} ${localStorage.getItem('lastName') ?? ''}`.trim();
 
   ngOnInit(): void {
     this.load();
@@ -43,9 +48,9 @@ export class DashboardComponent implements OnInit {
 
   get greeting(): string {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    const firstName = localStorage.getItem('firstName') ?? '';
+    const timeOfDay = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+    return firstName ? `${timeOfDay}, ${firstName}` : timeOfDay;
   }
 
   dueLabel(task: DueTask): string {
@@ -60,6 +65,18 @@ export class DashboardComponent implements OnInit {
     );
 
     return days <= 0 ? 'overdue' : `${days}d overdue`;
+  }
+
+  actorLabel(item: ProjectActivity): string {
+    return item.actorName === this.currentUserName ? 'You' : item.actorName;
+  }
+
+  activityDotColor(action: string): string {
+    if (action.includes('Deleted') || action.includes('Removed') || action.includes('Declined'))
+      return 'bg-red-500';
+    if (action.includes('Updated') || action.includes('Moved') || action.includes('Changed') || action.includes('Edited'))
+      return 'bg-amber-400';
+    return 'bg-[#08CB00]';
   }
 
   goToTask(task: DueTask): void {

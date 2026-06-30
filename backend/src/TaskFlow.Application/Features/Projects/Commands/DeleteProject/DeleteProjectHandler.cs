@@ -48,7 +48,7 @@ namespace TaskFlow.Application.Features.Projects.Commands.DeleteProject
 
             await _activityLogger.LogAsync(
                 _currentUser.UserId, "ProjectDeleted", "Project",
-                project.Id, $"Deleted project \"{project.Name}\"", cancellationToken);
+                project.Id, $"Deleted project \"{project.Name}\"", project.Id, project.Name, null, null, cancellationToken);
 
             _context.Projects.Remove(project);
 

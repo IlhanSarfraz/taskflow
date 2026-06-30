@@ -49,8 +49,16 @@ namespace TaskFlow.Application.Features.Auth.Handlers
                 _passwordHasher.Hash(request.NewPassword);
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "PasswordChanged", "User",
-                user.Id, "Changed account password", cancellationToken);
+                _currentUser.UserId,
+                "PasswordChanged",
+                "User",
+                user.Id,
+                "Changed account password",
+                null,
+                null,
+                null,
+                null,
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

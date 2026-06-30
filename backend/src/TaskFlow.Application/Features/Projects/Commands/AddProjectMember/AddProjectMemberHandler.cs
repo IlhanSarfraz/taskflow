@@ -39,14 +39,20 @@ namespace TaskFlow.Application.Features.Projects.Commands.AddProjectMember
 
             bool exists = await _context.ProjectMembers
                 .AnyAsync(x =>
-                        x.ProjectId == request.ProjectId &&
-                        x.UserId == request.UserId,
-                        cancellationToken);
+                    x.ProjectId == request.ProjectId &&
+                    x.UserId == request.UserId,
+                    cancellationToken);
 
             if (exists)
-            {
-                throw new InvalidOperationException("User already in project");
-            }
+                throw new InvalidOperationException("User already in project.");
+
+            Project project = await _context.Projects
+                .FirstOrDefaultAsync(x => x.Id == request.ProjectId, cancellationToken)
+                ?? throw new KeyNotFoundException("Project not found.");
+
+            User addedUser = await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken)
+                ?? throw new KeyNotFoundException("User not found.");
 
             ProjectMember member = new()
             {
@@ -58,8 +64,16 @@ namespace TaskFlow.Application.Features.Projects.Commands.AddProjectMember
             _context.ProjectMembers.Add(member);
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "MemberAdded", "Project",
-                request.ProjectId, $"Added user {request.UserId} to project", cancellationToken);
+                _currentUser.UserId,
+                "MemberAdded",
+                "Project",
+                request.ProjectId,
+                $"Added {addedUser.FirstName} {addedUser.LastName} to project",
+                request.ProjectId,
+                project.Name,
+                null,
+                null,
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

@@ -31,6 +31,8 @@ public sealed class AssignTaskHandler
             .Include(x => x.Project)
                 .ThenInclude(p => p.Members)
             .Include(x => x.Assignments)
+            .Include(x => x.BoardColumn)
+                .ThenInclude(bc => bc.Board)
             .FirstOrDefaultAsync(
                 x => x.Id == request.TaskId &&
                      (
@@ -80,6 +82,10 @@ public sealed class AssignTaskHandler
             "Task",
             task.Id,
             $"Updated assignments for task \"{task.Title}\"",
+            task.ProjectId,
+            task.Project.Name,
+            task.BoardColumn.BoardId,
+            task.BoardColumn.Board.Name,
             cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);

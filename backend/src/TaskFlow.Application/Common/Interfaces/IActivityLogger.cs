@@ -8,5 +8,9 @@ public interface IActivityLogger
         string entityType,
         Guid entityId,
         string description,
+        Guid? projectId,
+        string? projectName,
+        Guid? boardId,
+        string? boardName,
         CancellationToken cancellationToken = default);
 }

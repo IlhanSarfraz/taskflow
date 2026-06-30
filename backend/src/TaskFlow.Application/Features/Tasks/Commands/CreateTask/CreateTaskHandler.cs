@@ -27,28 +27,23 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateTask
             CreateTaskCommand request,
             CancellationToken cancellationToken)
         {
-            // Validate project ownership
-            bool projectExists = await _context.Projects
-                        .AnyAsync(
-                            x => x.Id == request.ProjectId &&
-                                 (
-                                     x.OwnerId == _currentUser.UserId ||
-                                     x.Members.Any(m => m.UserId == _currentUser.UserId)
-                                 ),
-                            cancellationToken);
+            Project project = await _context.Projects
+                .FirstOrDefaultAsync(
+                    x => x.Id == request.ProjectId &&
+                         (
+                             x.OwnerId == _currentUser.UserId ||
+                             x.Members.Any(m => m.UserId == _currentUser.UserId)
+                         ),
+                    cancellationToken)
+                ?? throw new KeyNotFoundException("Project not found.");
 
-            if (!projectExists)
-                throw new KeyNotFoundException("Project not found.");
-
-            // Validate column belongs to project
-            bool columnExists = await _context.BoardColumns
-                .AnyAsync(
+            BoardColumn column = await _context.BoardColumns
+                .Include(x => x.Board)
+                .FirstOrDefaultAsync(
                     x => x.Id == request.BoardColumnId &&
                          x.Board.ProjectId == request.ProjectId,
-                    cancellationToken);
-
-            if (!columnExists)
-                throw new KeyNotFoundException("Column not found.");
+                    cancellationToken)
+                ?? throw new KeyNotFoundException("Column not found.");
 
             int nextOrder = await _context.Tasks
                 .Where(x => x.BoardColumnId == request.BoardColumnId)
@@ -68,8 +63,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateTask
             _context.Tasks.Add(task);
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "TaskCreated", "Task",
-                task.Id, $"Created task \"{task.Title}\"", cancellationToken);
+                _currentUser.UserId,
+                "TaskCreated",
+                "Task",
+                task.Id,
+                $"Created task \"{task.Title}\"",
+                project.Id,
+                project.Name,
+                column.BoardId,
+                column.Board.Name,
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

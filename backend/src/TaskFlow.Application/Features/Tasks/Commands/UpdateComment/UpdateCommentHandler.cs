@@ -27,6 +27,11 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateComment
             CancellationToken cancellationToken)
         {
             TaskComment comment = await _context.TaskComments
+                .Include(x => x.Task)
+                    .ThenInclude(t => t.Project)
+                .Include(x => x.Task)
+                    .ThenInclude(t => t.BoardColumn)
+                        .ThenInclude(bc => bc.Board)
                 .FirstOrDefaultAsync(
                     x => x.Id == request.CommentId,
                     cancellationToken)
@@ -39,8 +44,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateComment
             comment.Content = request.Content;
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "CommentUpdated", "Task",
-                comment.TaskId, "Edited a comment", cancellationToken);
+                _currentUser.UserId,
+                "CommentUpdated",
+                "Task",
+                comment.TaskId,
+                $"Edited a comment on task \"{comment.Task.Title}\"",
+                comment.Task.ProjectId,
+                comment.Task.Project.Name,
+                comment.Task.BoardColumn.BoardId,
+                comment.Task.BoardColumn.Board.Name,
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

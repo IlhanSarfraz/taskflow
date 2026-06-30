@@ -29,6 +29,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteComment
         {
             TaskComment comment = await _context.TaskComments
                 .Include(x => x.Task)
+                    .ThenInclude(t => t.Project)
+                .Include(x => x.Task)
+                    .ThenInclude(t => t.BoardColumn)
+                        .ThenInclude(bc => bc.Board)
                 .FirstOrDefaultAsync(
                     x => x.Id == request.CommentId,
                     cancellationToken)
@@ -49,13 +53,20 @@ namespace TaskFlow.Application.Features.Tasks.Commands.DeleteComment
                 throw new UnauthorizedAccessException();
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "CommentDeleted", "Task",
-                comment.TaskId, "Deleted a comment", cancellationToken);
+                _currentUser.UserId,
+                "CommentDeleted",
+                "Task",
+                comment.TaskId,
+                $"Deleted a comment on task \"{comment.Task.Title}\"",
+                comment.Task.ProjectId,
+                comment.Task.Project.Name,
+                comment.Task.BoardColumn.BoardId,
+                comment.Task.BoardColumn.Board.Name,
+                cancellationToken);
 
             _context.TaskComments.Remove(comment);
 
-            await _context.SaveChangesAsync(
-                cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

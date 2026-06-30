@@ -116,7 +116,11 @@ namespace TaskFlow.Application.Features.Projects.Commands.CreateInvite
                 "InviteSent",
                 "Project",
                 request.ProjectId,
-                $"Invited {invitedUser.Email} to \"{project.Name}\"",
+                $"Invited {invitedUser.FirstName} {invitedUser.LastName} to \"{project.Name}\"",
+                request.ProjectId,
+                project.Name,
+                null,
+                null,
                 cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);

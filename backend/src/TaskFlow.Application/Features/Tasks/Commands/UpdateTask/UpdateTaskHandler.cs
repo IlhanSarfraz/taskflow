@@ -26,8 +26,10 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateTask
             UpdateTaskCommand request,
             CancellationToken cancellationToken)
         {
-            TaskItem? task = await _context.Tasks
+            TaskItem task = await _context.Tasks
                 .Include(x => x.Project)
+                .Include(x => x.BoardColumn)
+                    .ThenInclude(bc => bc.Board)
                 .FirstOrDefaultAsync(
                     x => x.Id == request.TaskId &&
                          (
@@ -43,8 +45,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.UpdateTask
             task.DueDate = request.DueDate;
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "TaskUpdated", "Task",
-                task.Id, $"Updated task \"{task.Title}\"", cancellationToken);
+                _currentUser.UserId,
+                "TaskUpdated",
+                "Task",
+                task.Id,
+                $"Updated task \"{task.Title}\"",
+                task.ProjectId,
+                task.Project.Name,
+                task.BoardColumn.BoardId,
+                task.BoardColumn.Board.Name,
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

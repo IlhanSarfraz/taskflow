@@ -25,33 +25,17 @@ namespace TaskFlow.Application.Features.Boards.Commands.CreateBoard
         }
 
         public async Task<BoardResponse> Handle(
-            CreateBoardCommand request,
-            CancellationToken cancellationToken)
+    CreateBoardCommand request,
+    CancellationToken cancellationToken)
         {
-            bool hasAccess = await _context.Projects
-              .AnyAsync(x =>
-                  x.Id == request.ProjectId &&
-                  (
-                      x.OwnerId == _currentUser.UserId ||
-                      x.Members.Any(m => m.UserId == _currentUser.UserId)
-                  ),
-                  cancellationToken);
-
-            if (!hasAccess)
-            {
-                throw new UnauthorizedAccessException(
-                    "You are not authorized to create boards.");
-            }
-
-
-            Project? project = await _context.Projects
+            Project project = await _context.Projects
                 .FirstOrDefaultAsync(x => x.Id == request.ProjectId &&
                 (
                     x.OwnerId == _currentUser.UserId ||
                     x.Members.Any(m => m.UserId == _currentUser.UserId)
                 ),
-                cancellationToken) ??
-                throw new KeyNotFoundException("Project not found");
+                cancellationToken)
+                ?? throw new KeyNotFoundException("Project not found.");
 
             Board board = new()
             {
@@ -63,16 +47,24 @@ namespace TaskFlow.Application.Features.Boards.Commands.CreateBoard
 
             List<BoardColumn> columns =
             [
-                new BoardColumn { Name = BoardColumnNames.ToDo,        Order = 0, Board = board },
-                new BoardColumn { Name = BoardColumnNames.InProgress,  Order = 1, Board = board },
-                new BoardColumn { Name = BoardColumnNames.Done,        Order = 2, Board = board }
+                new BoardColumn { Name = BoardColumnNames.ToDo,       Order = 0, Board = board },
+                new BoardColumn { Name = BoardColumnNames.InProgress, Order = 1, Board = board },
+                new BoardColumn { Name = BoardColumnNames.Done,       Order = 2, Board = board , IsDoneColumn = true}
             ];
 
             _context.BoardColumns.AddRange(columns);
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "BoardCreated", "Board",
-                board.Id, $"Created board \"{board.Name}\"", cancellationToken);
+                _currentUser.UserId,
+                "BoardCreated",
+                "Board",
+                board.Id,
+                $"Created board \"{board.Name}\"",
+                project.Id,
+                project.Name,
+                board.Id,
+                board.Name,
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

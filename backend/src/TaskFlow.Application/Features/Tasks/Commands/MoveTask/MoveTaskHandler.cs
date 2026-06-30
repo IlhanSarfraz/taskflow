@@ -38,23 +38,16 @@ namespace TaskFlow.Application.Features.Tasks.Commands.MoveTask
                 ?? throw new KeyNotFoundException("Task not found.");
 
             BoardColumn targetColumn = await _context.BoardColumns
+                .Include(x => x.Board)
                 .FirstOrDefaultAsync(
                     x => x.Id == request.TargetColumnId,
                     cancellationToken)
                 ?? throw new KeyNotFoundException("Target column not found.");
 
-            bool sameProject = await _context.BoardColumns
-                .AnyAsync(
-                    x => x.Id == request.TargetColumnId &&
-                         x.Board.ProjectId == task.ProjectId,
-                    cancellationToken);
-
-            if (!sameProject)
+            if (targetColumn.Board.ProjectId != task.ProjectId)
                 throw new InvalidOperationException("Cannot move tasks across projects.");
 
-            // =========================
-            // OLD COLUMN - REMOVE + REINDEX
-            // =========================
+            // OLD COLUMN — remove + reindex
             List<TaskItem> oldColumnTasks = await _context.Tasks
                 .Where(x => x.BoardColumnId == task.BoardColumnId)
                 .OrderBy(x => x.Order)
@@ -63,30 +56,17 @@ namespace TaskFlow.Application.Features.Tasks.Commands.MoveTask
             oldColumnTasks.RemoveAll(x => x.Id == task.Id);
 
             for (int i = 0; i < oldColumnTasks.Count; i++)
-            {
                 oldColumnTasks[i].Order = i;
-            }
 
-            // =========================
             // MOVE TASK
-            // =========================
             task.BoardColumnId = request.TargetColumnId;
 
-            // Track completion
             if (targetColumn.IsDoneColumn)
-            {
-                // Only stamp the first time the task enters Done
                 task.CompletedAtUtc ??= DateTime.UtcNow;
-            }
             else
-            {
-                // Task has been reopened
                 task.CompletedAtUtc = null;
-            }
 
-            // =========================
-            // TARGET COLUMN - ADD + REINDEX
-            // =========================
+            // TARGET COLUMN — add + reindex
             List<TaskItem> targetTasks = await _context.Tasks
                 .Where(x => x.BoardColumnId == request.TargetColumnId)
                 .OrderBy(x => x.Order)
@@ -96,16 +76,18 @@ namespace TaskFlow.Application.Features.Tasks.Commands.MoveTask
             targetTasks.Add(task);
 
             for (int i = 0; i < targetTasks.Count; i++)
-            {
                 targetTasks[i].Order = i;
-            }
 
             await _activityLogger.LogAsync(
                 _currentUser.UserId,
                 "TaskMoved",
                 "Task",
                 task.Id,
-                $"Moved task \"{task.Title}\" to column \"{targetColumn.Name}\"",
+                $"Moved task \"{task.Title}\" to \"{targetColumn.Name}\"",
+                task.ProjectId,
+                task.Project.Name,
+                targetColumn.BoardId,
+                targetColumn.Board.Name,
                 cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);

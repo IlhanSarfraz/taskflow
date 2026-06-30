@@ -94,11 +94,54 @@
     </div>
     </div>
 
-    <!-- Project activity — NOT WIRED YET, no backend endpoint exists for this -->
-    <div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
-      <h3 class="text-white font-semibold mb-3">Project activity</h3>
-      <p class="text-gray-600 text-sm">Activity feed coming soon.</p>
+<!-- Project activity -->
+<div class="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5">
+  <h3 class="text-white font-semibold mb-4">Project activity</h3>
+
+  <p *ngIf="overview.activity.length === 0" class="text-gray-600 text-sm">
+    No activity yet.
+  </p>
+
+  <div
+    *ngFor="let a of overview.activity; let last = last"
+    class="flex gap-3 py-2.5"
+    [class.border-b]="!last"
+    [class.border-gray-800]="!last"
+  >
+    <!-- Actor avatar -->
+    <div class="w-7 h-7 rounded-full bg-[#08CB00]/20 text-[#08CB00] text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+      {{ actorLabel(a).charAt(0).toUpperCase() }}
     </div>
+
+    <div class="min-w-0 flex-1">
+      <!-- Description with actor name bolded -->
+      <p class="text-gray-200 text-sm leading-snug">
+        <span class="font-medium text-white">{{ actorLabel(a) }}</span>
+        {{ a.description.replace(actorLabel(a), '').trim() }}
+      </p>
+
+      <!-- Breadcrumb + time -->
+      <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+        <span *ngIf="a.projectName" class="bg-[#202020] text-gray-400 text-[11px] px-1.5 py-0.5 rounded">
+          {{ a.projectName }}
+        </span>
+        <ng-container *ngIf="a.boardName">
+          <i class="fa-solid fa-chevron-right text-gray-600 text-[9px]"></i>
+          <span class="bg-[#202020] text-gray-400 text-[11px] px-1.5 py-0.5 rounded">
+            {{ a.boardName }}
+          </span>
+        </ng-container>
+        <span class="text-gray-600 text-[11px]">&middot; {{ a.createdAtUtc | relativeTime }}</span>
+      </div>
+    </div>
+
+    <!-- Action type dot -->
+    <span
+      class="w-2 h-2 rounded-full shrink-0 mt-2"
+      [ngClass]="activityDotColor(a.action)"
+    ></span>
+  </div>
+</div>
 
   </ng-container>
 </div>

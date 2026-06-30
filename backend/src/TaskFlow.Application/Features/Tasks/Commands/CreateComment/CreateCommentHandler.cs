@@ -34,14 +34,20 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateComment
                 request.TaskId,
                 cancellationToken);
 
-            bool taskExists = await _context.Tasks
-                .AnyAsync(
+            TaskItem task = await _context.Tasks
+                .Include(x => x.Project)
+                .Include(x => x.BoardColumn)
+                    .ThenInclude(bc => bc.Board)
+                .FirstOrDefaultAsync(
                     x => x.Id == request.TaskId,
-                    cancellationToken);
+                    cancellationToken)
+                ?? throw new KeyNotFoundException("Task not found.");
 
-            if (!taskExists)
-                throw new KeyNotFoundException(
-                    "Task not found.");
+            User user = await _context.Users
+                .FirstOrDefaultAsync(
+                    x => x.Id == _currentUser.UserId,
+                    cancellationToken)
+                ?? throw new KeyNotFoundException("User not found.");
 
             TaskComment comment = new()
             {
@@ -53,16 +59,18 @@ namespace TaskFlow.Application.Features.Tasks.Commands.CreateComment
             _context.TaskComments.Add(comment);
 
             await _activityLogger.LogAsync(
-                _currentUser.UserId, "CommentAdded", "Task",
-                request.TaskId, $"Commented on task", cancellationToken);
-
-            await _context.SaveChangesAsync(
+                _currentUser.UserId,
+                "CommentAdded",
+                "Task",
+                request.TaskId,
+                $"Commented on task \"{task.Title}\"",
+                task.ProjectId,
+                task.Project.Name,
+                task.BoardColumn.BoardId,
+                task.BoardColumn.Board.Name,
                 cancellationToken);
 
-            User user = await _context.Users
-               .FirstAsync(
-                   x => x.Id == _currentUser.UserId,
-                   cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return new CommentResponse(
                 comment.Id,

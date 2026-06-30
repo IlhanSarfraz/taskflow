@@ -8,11 +8,14 @@ namespace TaskFlow.Domain.Entities
         public User User { get; set; } = null!;
 
         public string Action { get; set; } = string.Empty;
-
         public string EntityType { get; set; } = string.Empty;
-
         public Guid EntityId { get; set; }
-
         public string Description { get; set; } = string.Empty;
+
+        public Guid? ProjectId { get; set; }
+        public string? ProjectName { get; set; } = string.Empty;
+
+        public Guid? BoardId { get; set; }
+        public string? BoardName { get; set; }
     }
 }

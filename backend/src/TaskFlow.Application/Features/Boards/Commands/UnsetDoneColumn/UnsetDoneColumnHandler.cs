@@ -30,6 +30,7 @@ public sealed class UnsetDoneColumnHandler
         CancellationToken cancellationToken)
     {
         Board board = await _context.Boards
+            .Include(x => x.Project)
             .FirstOrDefaultAsync(
                 x => x.Id == request.BoardId,
                 cancellationToken)
@@ -55,9 +56,7 @@ public sealed class UnsetDoneColumnHandler
             .ToListAsync(cancellationToken);
 
         foreach (TaskItem task in completedTasks)
-        {
             task.CompletedAtUtc = null;
-        }
 
         await _activityLogger.LogAsync(
             _currentUser.UserId,
@@ -65,6 +64,10 @@ public sealed class UnsetDoneColumnHandler
             "Board",
             board.Id,
             $"Unset \"{doneColumn.Name}\" as the Done column.",
+            board.ProjectId,
+            board.Project.Name,
+            board.Id,
+            board.Name,
             cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);

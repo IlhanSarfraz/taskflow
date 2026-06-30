@@ -27,18 +27,19 @@ public sealed class GetDashboardOverviewHandler
         GetDashboardOverviewQuery request,
         CancellationToken cancellationToken)
     {
-        List<Guid> projectIds = await _authorization.GetAccessibleProjectIdsAsync(cancellationToken);
+        List<Guid> projectIds = await _authorization
+            .GetAccessibleProjectIdsAsync(cancellationToken);
 
         DateTime today = DateTime.UtcNow.Date;
         DateTime weekAgo = today.AddDays(-7);
 
-        // Base set: tasks in my projects, assigned to me, not in a done column.
         IQueryable<TaskItem> myOpenTasksQuery = _context.Tasks
             .Where(t => projectIds.Contains(t.ProjectId))
             .Where(t => t.Assignments.Any(a => a.UserId == _currentUser.UserId))
             .Where(t => !t.BoardColumn.IsDoneColumn);
 
-        int assignedCount = await myOpenTasksQuery.CountAsync(cancellationToken);
+        int assignedCount = await myOpenTasksQuery
+            .CountAsync(cancellationToken);
 
         int dueTodayCount = await myOpenTasksQuery
             .Where(t => t.DueDate.HasValue && t.DueDate.Value.Date == today)
@@ -72,8 +73,6 @@ public sealed class GetDashboardOverviewHandler
             })
             .ToListAsync(cancellationToken);
 
-        // Progress per project the user can access. Starts from Projects, not Tasks,
-        // so a project with no tasks yet still shows up at 0% instead of disappearing.
         List<ProjectProgressDto> projectProgress = await _context.Projects
             .Where(p => projectIds.Contains(p.Id))
             .Select(p => new ProjectProgressDto
@@ -84,7 +83,30 @@ public sealed class GetDashboardOverviewHandler
                 CompletedTaskCount = p.Tasks.Count(t => t.BoardColumn.IsDoneColumn),
                 ProgressPercent = p.Tasks.Count == 0
                     ? 0
-                    : (int)Math.Round(p.Tasks.Count(t => t.BoardColumn.IsDoneColumn) * 100.0 / p.Tasks.Count)
+                    : (int)Math.Round(
+                        p.Tasks.Count(t => t.BoardColumn.IsDoneColumn) * 100.0 / p.Tasks.Count)
+            })
+            .ToListAsync(cancellationToken);
+
+        // Cross-project activity feed: all activity rows belonging to projects
+        // the current user can access, ordered newest first, capped at 30.
+        // ActorName resolved via join — "You" substituted on the frontend
+        // when ActorUserId matches the logged-in user.
+        List<ProjectActivityDto> activity = await _context.ActivityLogs
+            .Where(a => a.ProjectId != null && projectIds.Contains(a.ProjectId.Value))
+            .OrderByDescending(a => a.CreatedAtUtc)
+            .Take(30)
+            .Select(a => new ProjectActivityDto
+            {
+                Id = a.Id,
+                Action = a.Action,
+                Description = a.Description,
+                ActorName = a.User.FirstName + " " + a.User.LastName,
+                ProjectId = a.ProjectId,
+                ProjectName = a.ProjectName,
+                BoardId = a.BoardId,
+                BoardName = a.BoardName,
+                CreatedAtUtc = a.CreatedAtUtc
             })
             .ToListAsync(cancellationToken);
 
@@ -95,7 +117,8 @@ public sealed class GetDashboardOverviewHandler
             OverdueCount = overdueCount,
             CompletedThisWeekCount = completedThisWeekCount,
             DueOrOverdueTasks = dueOrOverdueTasks,
-            Projects = projectProgress
+            Projects = projectProgress,
+            Activity = activity
         };
     }
 }

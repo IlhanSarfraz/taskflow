@@ -50,7 +50,12 @@ public sealed class UpdateProfileHandler
             "ProfileUpdated",
             "User",
             user.Id,
-            "Updated profile information");
+            "Updated profile information",
+            null,
+            null,
+            null,
+            null,
+            cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);
     }
